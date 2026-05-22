@@ -59,11 +59,9 @@ database.ref('frases').on('child_added', (snapshot) => {
 
 // Decide cómo pintar la frase según el dispositivo
 function procesarDistribuciónFrase(texto) {
-    // Detecta si es pantalla móvil basándose en los 600px del Media Query de CSS
     const esMovil = window.innerWidth <= 600;
 
     if (esMovil) {
-        // Separa por palabras individuales
         const palabras = texto.split(' ');
         palabras.forEach(palabra => {
             if (palabra.trim() !== "") {
@@ -71,41 +69,50 @@ function procesarDistribuciónFrase(texto) {
             }
         });
     } else {
-        // Comportamiento por defecto para PC
         crearFraseEnPantallaPC(texto);
     }
 }
 
-// NUEVA FUNCIÓN: Distribuye palabras individuales en lugares random con colores fosforescentes (Móviles)
+// NUEVA LOGICA: Las palabras se quedan fijas en el DOM corriendo en un bucle infinito de CSS
 function crearPalabraAleatoriaMovil(palabra) {
     const elementoPalabra = document.createElement('div');
     elementoPalabra.classList.add('frase-animada');
     elementoPalabra.innerText = palabra;
 
-    // Asigna un color fosforescente aleatorio desde las clases CSS
-    const claseColorAleatorio = clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)];
-    elementoPalabra.classList.add(claseColorAleatorio);
+    // Asignación inicial de posición y color fosforescente
+    cambiarColorYPosicion(elementoPalabra);
 
-    // Posición X e Y aleatorias restringidas entre 5% y 85% para que no se corten en los bordes físicos del teléfono
+    // Retraso inicial aleatorio para que no aparezcan todas al mismo tiempo al cargar
+    const retraso = Math.random() * 5;
+    elementoPalabra.style.animationDelay = `${retraso}s`;
+
+    // Escucha cuando la animación termina una repetición completa (cuando opacidad es 0)
+    // Justo en ese momento reubica la palabra y cambia su color para la siguiente vuelta
+    elementoPalabra.addEventListener('animationiteration', () => {
+        cambiarColorYPosicion(elementoPalabra);
+    });
+
+    contenedorFondo.appendChild(elementoPalabra);
+}
+
+// Función auxiliar para mover la palabra y alternar su color sin romper el flujo
+function cambiarColorYPosicion(elemento) {
+    // Remover clases de color anteriores para evitar acumulación
+    clasesFosforo.forEach(clase => elemento.classList.remove(clase));
+
+    // Elegir nuevo color
+    const claseColorAleatorio = clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)];
+    elemento.classList.add(claseColorAleatorio);
+
+    // Calcular nuevas coordenadas aleatorias
     const posicionX = Math.floor(Math.random() * 80) + 5;
     const posicionY = Math.floor(Math.random() * 80) + 5;
 
-    elementoPalabra.style.left = `${posicionX}%`;
-    elementoPalabra.style.top = `${posicionY}%`;
-
-    // Variación pequeña en los tiempos de animación para romper la sincronía
-    const retraso = Math.random() * 1.5;
-    elementoPalabra.style.animationDelay = `${retraso}s`;
-
-    contenedorFondo.appendChild(elementoPalabra);
-
-    // Se elimina tras 4 segundos siguiendo el ciclo de la animación CSS 'aparecerFosforo'
-    setTimeout(() => {
-        elementoPalabra.remove();
-    }, 4500);
+    elemento.style.left = `${posicionX}%`;
+    elemento.style.top = `${posicionY}%`;
 }
 
-// FUNCIÓN ORIGINAL ADAPTADA: Mantiene el flujo clásico hacia arriba para computadoras
+// Mantiene el flujo clásico hacia arriba para computadoras sin alteración
 function crearFraseEnPantallaPC(texto) {
     const elementoFrase = document.createElement('div');
     elementoFrase.classList.add('frase-animada');
@@ -124,7 +131,6 @@ function crearFraseEnPantallaPC(texto) {
     }, 14000); 
 }
 
-// Mantiene los colores por letra tradicionales exclusivamente para la vista de PC
 function crearColoresLetrasPC(texto) {
     const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
     return texto.split('').map(letra => {
@@ -132,9 +138,3 @@ function crearColoresLetrasPC(texto) {
         return `<span style="color: ${colorAleatorio}; font-weight: bold;">${letra}</span>`;
     }).join('');
 }
-
-// Limpieza automática preventiva del fondo
-setInterval(() => {
-    const frases = document.querySelectorAll('.frase-animada');
-    frases.forEach(frase => frase.remove());
-}, 600000);
