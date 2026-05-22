@@ -13,13 +13,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Lista negra básica para el filtro de negatividad todas las groserias y palabras ofensivas que se me ocurrieron, si quieres agregar más solo añádelas a este array
+// Lista negra ampliada para el filtro de negatividad
 const palabrasNegativas = [
-    // Palabras del código original
     "malo", "horrible", "feo", "terrible", "odioso", "desagradable", "horrendo", "asqueroso",
     "maldito", "pésimo", "decepcionante", "desastroso", "nefasto", "lamentable", "tonto", "basura", "estupido", "morir", "asco",
-    
-    // Insultos, groserías y lenguaje obsceno
     "pendejo", "pendeja", "pendejos", "pendejas",
     "chingar", "chingada", "chingado", "chingaderas", "chingon", "chingo",
     "cabron", "cabrona", "cabrones",
@@ -80,61 +77,59 @@ function procesarDistribuciónFrase(texto) {
     const esMovil = window.innerWidth <= 600;
 
     if (esMovil) {
-        // El filtro limpia espacios dobles o saltos de línea para aislar palabras reales completas
-        const palabras = texto.split(/\s+/);
-        palabras.forEach(palabra => {
-            if (palabra.trim() !== "") {
-                crearPalabraAleatoriaMovil(palabra);
-            }
-        });
+        // YA NO USA SPLIT. Pasa la frase completa directamente para que no se separe.
+        if (texto.trim() !== "") {
+            crearFraseAleatoriaMovil(texto);
+        }
     } else {
+        // Comportamiento por defecto para PC
         crearFraseEnPantallaPC(texto);
     }
 }
 
-// Las palabras se quedan fijas en el DOM corriendo en un bucle infinito de CSS
-function crearPalabraAleatoriaMovil(palabra) {
-    const elementoPalabra = document.createElement('div');
-    elementoPalabra.classList.add('frase-animada');
-    elementoPalabra.innerText = palabra;
+// Modificado: Ahora maneja la frase completa en pantallas móviles
+function crearFraseAleatoriaMovil(fraseCompleta) {
+    const elementoFrase = document.createElement('div');
+    elementoFrase.classList.add('frase-animada');
+    elementoFrase.innerText = fraseCompleta; // Inserta toda la frase junta
     
-    // Forzar que la palabra se mantenga siempre junta en una sola línea horizontal
-    elementoPalabra.style.whiteSpace = 'nowrap';
-    elementoPalabra.style.display = 'inline-block';
+    // Forzar a que la frase se mantenga recta y no haga saltos de línea raros
+    elementoFrase.style.whiteSpace = 'nowrap';
+    elementoFrase.style.display = 'inline-block';
 
-    // Asignación inicial de posición y color fosforescente
-    cambiarColorYPosicion(elementoPalabra);
+    // Asignación de posición y color fosforescente al bloque completo
+    cambiarColorYPosicion(elementoFrase);
 
-    // Retraso inicial aleatorio para que no aparezcan todas al mismo tiempo al cargar
+    // Retraso inicial aleatorio para alternar los tiempos de aparición
     const retraso = Math.random() * 5;
-    elementoPalabra.style.animationDelay = `${retraso}s`;
+    elementoFrase.style.animationDelay = `${retraso}s`;
 
-    // Escucha cuando la animación termina una repetición completa (cuando opacidad es 0)
-    elementoPalabra.addEventListener('animationiteration', () => {
-        cambiarColorYPosicion(elementoPalabra);
+    // Cambia de lugar y color cada vez que se vuelve invisible en el bucle eterno
+    elementoFrase.addEventListener('animationiteration', () => {
+        cambiarColorYPosicion(elementoFrase);
     });
 
-    contenedorFondo.appendChild(elementoPalabra);
+    contenedorFondo.appendChild(elementoFrase);
 }
 
-// Función auxiliar para mover la palabra y alternar su color sin romper el flujo
+// Cambia la posición y el color fosforescente del elemento completo
 function cambiarColorYPosicion(elemento) {
-    // Remover clases de color anteriores para evitar acumulación
+    // Limpia el color anterior
     clasesFosforo.forEach(clase => elemento.classList.remove(clase));
 
-    // Elegir nuevo color
+    // Elige un nuevo color para toda la frase
     const claseColorAleatorio = clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)];
     elemento.classList.add(claseColorAleatorio);
 
-    // Reduje el margen del Math.random de 80 a 70 para asegurar que palabras largas tengan espacio de sobra en los laterales
-    const posicionX = Math.floor(Math.random() * 70) + 5;
-    const posicionY = Math.floor(Math.random() * 70) + 5;
+    // Coordenadas aleatorias controladas para que las frases largas no se salgan de la pantalla por los lados
+    const posicionX = Math.floor(Math.random() * 50) + 5; // Margen más seguro a la derecha
+    const posicionY = Math.floor(Math.random() * 80) + 5;
 
     elemento.style.left = `${posicionX}%`;
     elemento.style.top = `${posicionY}%`;
 }
 
-// Mantiene el flujo clásico hacia arriba para computadoras sin alteración
+// Mantiene el flujo clásico para computadoras
 function crearFraseEnPantallaPC(texto) {
     const elementoFrase = document.createElement('div');
     elementoFrase.classList.add('frase-animada');
@@ -160,3 +155,9 @@ function crearColoresLetrasPC(texto) {
         return `<span style="color: ${colorAleatorio}; font-weight: bold;">${letra}</span>`;
     }).join('');
 }
+
+// Limpieza general automática
+setInterval(() => {
+    const frases = document.querySelectorAll('.frase-animada');
+    frases.forEach(frase => frase.remove());
+}, 600000);
