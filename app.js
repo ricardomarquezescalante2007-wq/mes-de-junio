@@ -173,3 +173,4 @@ setInterval(() => {
 }, 600000);
 
 //animacion de los mensajes en el movil desbanescando y apareciendo suavemente
+
