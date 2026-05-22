@@ -73,16 +73,17 @@ database.ref('frases').on('child_added', (snapshot) => {
 });
 
 // Decide cómo pintar la frase según el dispositivo
+// Filtra las palabras sueltas viejas de la base de datos
 function procesarDistribuciónFrase(texto) {
     const esMovil = window.innerWidth <= 600;
 
     if (esMovil) {
-        // YA NO USA SPLIT. Pasa la frase completa directamente para que no se separe.
-        if (texto.trim() !== "") {
+        // PARCHE: Si el texto no contiene espacios, significa que es una palabra suelta vieja.
+        // Esto evita que se pinten los residuos del código anterior.
+        if (texto.trim() !== "" && texto.includes(' ')) {
             crearFraseAleatoriaMovil(texto);
         }
     } else {
-        // Comportamiento por defecto para PC
         crearFraseEnPantallaPC(texto);
     }
 }
