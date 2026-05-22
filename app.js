@@ -36,6 +36,8 @@ const formulario = document.getElementById('formulario-mensaje');
 const entrada = document.getElementById('entrada-mensaje');
 const mensajeError = document.getElementById('mensaje-error');
 const contenedorFondo = document.getElementById('fondo-frases');
+const tarjetaPrincipal = document.querySelector('.contenedor-principal');
+const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
 
 // Clases de colores fosforescentes declaradas en el CSS
 const clasesFosforo = ['fosforo-verde', 'fosforo-rosa', 'fosforo-azul', 'fosforo-amarillo', 'fosforo-naranja'];
@@ -61,9 +63,26 @@ formulario.addEventListener('submit', (e) => {
         });
 
         entrada.value = ''; // Limpiar el campo
+
+        // ANIMACIÓN: Ocultar la tarjeta hacia la derecha y mostrar el botón de reapertura
+        tarjetaPrincipal.classList.remove('deslizar-mostrar');
+        tarjetaPrincipal.classList.add('deslizar-ocultar');
+        
+        // El botón aparece suavemente después de que la tarjeta se desliza
+        setTimeout(() => {
+            btnAbrirFormulario.classList.remove('oculto');
+        }, 400);
+
     } else {
         mensajeError.classList.remove('oculto');
     }
+});
+
+// Evento para volver a mostrar la tarjeta al presionar el botón de abajo
+btnAbrirFormulario.addEventListener('click', () => {
+    btnAbrirFormulario.classList.add('oculto');
+    tarjetaPrincipal.classList.remove('deslizar-ocultar');
+    tarjetaPrincipal.classList.add('deslizar-mostrar');
 });
 
 // Escuchar la base de datos en tiempo real
@@ -73,13 +92,11 @@ database.ref('frases').on('child_added', (snapshot) => {
 });
 
 // Decide cómo pintar la frase según el dispositivo
-// Filtra las palabras sueltas viejas de la base de datos
 function procesarDistribuciónFrase(texto) {
     const esMovil = window.innerWidth <= 600;
 
     if (esMovil) {
-        // PARCHE: Si el texto no contiene espacios, significa que es una palabra suelta vieja.
-        // Esto evita que se pinten los residuos del código anterior.
+        // Filtro para saltarse los residuos/palabras sueltas antiguas de la base de datos
         if (texto.trim() !== "" && texto.includes(' ')) {
             crearFraseAleatoriaMovil(texto);
         }
@@ -88,24 +105,20 @@ function procesarDistribuciónFrase(texto) {
     }
 }
 
-// Modificado: Ahora maneja la frase completa en pantallas móviles
+// Lógica para pantallas móviles (Frase completa e infinita)
 function crearFraseAleatoriaMovil(fraseCompleta) {
     const elementoFrase = document.createElement('div');
     elementoFrase.classList.add('frase-animada');
-    elementoFrase.innerText = fraseCompleta; // Inserta toda la frase junta
+    elementoFrase.innerText = fraseCompleta;
     
-    // Forzar a que la frase se mantenga recta y no haga saltos de línea raros
     elementoFrase.style.whiteSpace = 'nowrap';
     elementoFrase.style.display = 'inline-block';
 
-    // Asignación de posición y color fosforescente al bloque completo
     cambiarColorYPosicion(elementoFrase);
 
-    // Retraso inicial aleatorio para alternar los tiempos de aparición
     const retraso = Math.random() * 5;
     elementoFrase.style.animationDelay = `${retraso}s`;
 
-    // Cambia de lugar y color cada vez que se vuelve invisible en el bucle eterno
     elementoFrase.addEventListener('animationiteration', () => {
         cambiarColorYPosicion(elementoFrase);
     });
@@ -113,17 +126,13 @@ function crearFraseAleatoriaMovil(fraseCompleta) {
     contenedorFondo.appendChild(elementoFrase);
 }
 
-// Cambia la posición y el color fosforescente del elemento completo
 function cambiarColorYPosicion(elemento) {
-    // Limpia el color anterior
     clasesFosforo.forEach(clase => elemento.classList.remove(clase));
 
-    // Elige un nuevo color para toda la frase
     const claseColorAleatorio = clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)];
     elemento.classList.add(claseColorAleatorio);
 
-    // Coordenadas aleatorias controladas para que las frases largas no se salgan de la pantalla por los lados
-    const posicionX = Math.floor(Math.random() * 50) + 5; // Margen más seguro a la derecha
+    const posicionX = Math.floor(Math.random() * 45) + 5; // Ajuste horizontal prudente
     const posicionY = Math.floor(Math.random() * 80) + 5;
 
     elemento.style.left = `${posicionX}%`;
@@ -162,3 +171,5 @@ setInterval(() => {
     const frases = document.querySelectorAll('.frase-animada');
     frases.forEach(frase => frase.remove());
 }, 600000);
+
+//animacion de los mensajes en el movil desbanescando y apareciendo suavemente
