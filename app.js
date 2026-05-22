@@ -22,10 +22,12 @@ const entrada = document.getElementById('entrada-mensaje');
 const mensajeError = document.getElementById('mensaje-error');
 const contenedorFondo = document.getElementById('fondo-frases');
 
+// Clases de colores fosforescentes declaradas en el CSS
+const clasesFosforo = ['fosforo-verde', 'fosforo-rosa', 'fosforo-azul', 'fosforo-amarillo', 'fosforo-naranja'];
+
 // Función para validar si la frase es positiva
 function esFrasePositiva(texto) {
     const textoMinusculas = texto.toLowerCase();
-    // Verifica si alguna palabra de la lista negra está en el texto
     return !palabrasNegativas.some(palabra => textoMinusculas.includes(palabra));
 }
 
@@ -45,58 +47,85 @@ formulario.addEventListener('submit', (e) => {
 
         entrada.value = ''; // Limpiar el campo
     } else {
-        // Mostrar error si la frase contiene palabras negativas
         mensajeError.classList.remove('oculto');
     }
 });
 
 // Escuchar la base de datos en tiempo real
-// Cada vez que se añade un nodo a 'frases', se ejecuta esta función para todos los usuarios
 database.ref('frases').on('child_added', (snapshot) => {
     const datos = snapshot.val();
-    crearFraseEnPantalla(datos.texto);
+    procesarDistribuciónFrase(datos.texto);
 });
 
-// Función para crear el elemento HTML de la frase y añadirlo al fondo
-function crearFraseEnPantalla(texto) {
+// Decide cómo pintar la frase según el dispositivo
+function procesarDistribuciónFrase(texto) {
+    // Detecta si es pantalla móvil basándose en los 600px del Media Query de CSS
+    const esMovil = window.innerWidth <= 600;
+
+    if (esMovil) {
+        // Separa por palabras individuales
+        const palabras = texto.split(' ');
+        palabras.forEach(palabra => {
+            if (palabra.trim() !== "") {
+                crearPalabraAleatoriaMovil(palabra);
+            }
+        });
+    } else {
+        // Comportamiento por defecto para PC
+        crearFraseEnPantallaPC(texto);
+    }
+}
+
+// NUEVA FUNCIÓN: Distribuye palabras individuales en lugares random con colores fosforescentes (Móviles)
+function crearPalabraAleatoriaMovil(palabra) {
+    const elementoPalabra = document.createElement('div');
+    elementoPalabra.classList.add('frase-animada');
+    elementoPalabra.innerText = palabra;
+
+    // Asigna un color fosforescente aleatorio desde las clases CSS
+    const claseColorAleatorio = clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)];
+    elementoPalabra.classList.add(claseColorAleatorio);
+
+    // Posición X e Y aleatorias restringidas entre 5% y 85% para que no se corten en los bordes físicos del teléfono
+    const posicionX = Math.floor(Math.random() * 80) + 5;
+    const posicionY = Math.floor(Math.random() * 80) + 5;
+
+    elementoPalabra.style.left = `${posicionX}%`;
+    elementoPalabra.style.top = `${posicionY}%`;
+
+    // Variación pequeña en los tiempos de animación para romper la sincronía
+    const retraso = Math.random() * 1.5;
+    elementoPalabra.style.animationDelay = `${retraso}s`;
+
+    contenedorFondo.appendChild(elementoPalabra);
+
+    // Se elimina tras 4 segundos siguiendo el ciclo de la animación CSS 'aparecerFosforo'
+    setTimeout(() => {
+        elementoPalabra.remove();
+    }, 4500);
+}
+
+// FUNCIÓN ORIGINAL ADAPTADA: Mantiene el flujo clásico hacia arriba para computadoras
+function crearFraseEnPantallaPC(texto) {
     const elementoFrase = document.createElement('div');
     elementoFrase.classList.add('frase-animada');
-    elementoFrase.innerHTML = crearColoresFosforecentes(texto); // Aplicar colores fosforescentes a cada letra
+    elementoFrase.innerHTML = crearColoresLetrasPC(texto);
 
-    // Posición horizontal aleatoria (entre 5% y 85% para evitar cortes en los bordes)
     const posicionX = Math.floor(Math.random() * 80) + 5;
     elementoFrase.style.left = `${posicionX}%`;
 
-    // Retraso aleatorio en la animación para que no salgan todas simétricas si entran juntas
     const retraso = Math.random() * 2;
     elementoFrase.style.animationDelay = `${retraso}s`;
 
     contenedorFondo.appendChild(elementoFrase);
 
-    // Eliminar el elemento del DOM una vez termine la animación CSS (12 segundos)
     setTimeout(() => {
         elementoFrase.remove();
     }, 14000); 
 }
 
-// funcion para eliminar frases antiguas cada cierto tiempo (opcional, para evitar saturar el fondo)
-setInterval(() => {
-    const frases = document.querySelectorAll('.frase-animada');
-    frases.forEach(frase => frase.remove());
-}, 6000000000); // Eliminar frases cada 6000000000 segundos
-
-//funcion para que cada palabra tenga un resalto diferente (opcional, para hacer el fondo más colorido)
-function resaltarPalabras(texto) {
-    const palabras = texto.split(' ');
-    return palabras.map(palabra => {
-        const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
-        const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
-        return `<span style="color: ${colorAleatorio}; font-weight: bold;">${palabra}</span>`;
-    }).join(' ');
-}
-
-//funcion para crear colores fosforecentes en cada palabra (opcional, para hacer el fondo más colorido)
-function crearColoresFosforecentes(texto) {
+// Mantiene los colores por letra tradicionales exclusivamente para la vista de PC
+function crearColoresLetrasPC(texto) {
     const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
     return texto.split('').map(letra => {
         const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
@@ -104,4 +133,8 @@ function crearColoresFosforecentes(texto) {
     }).join('');
 }
 
-
+// Limpieza automática preventiva del fondo
+setInterval(() => {
+    const frases = document.querySelectorAll('.frase-animada');
+    frases.forEach(frase => frase.remove());
+}, 600000);
