@@ -343,3 +343,13 @@ button:hover {
     background-clip: text;  
         color: transparent;
 }
+
+/* Cambia esto en tu CSS de móviles para que no se detenga */
+.frase-animada {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+    white-space: nowrap;
+    animation: aparecerFosforo 6s ease-in-out infinite; /* Se cambió 'forwards' por 'infinite' y subió a 6s para mayor suavidad */
+    pointer-events: none;
+}
