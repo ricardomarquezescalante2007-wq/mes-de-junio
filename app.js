@@ -24,8 +24,10 @@ const palabrasNegativas = [
     "mierda", "mierdas", "cagado", "cagar", "cagada",
     "puto", "puta", "putitos", "putitas", "putazos",
     "pito", "verga", "vergas", "riata", "meco", "mecos",
-    "mamon", "mamona", "mamar", "mamadas",
-    "buey", "guey", "wey",
+    "mamon", "mamona", "mamar", "mamadas", "p u t o", 
+    "buey", "guey", "wey", " p e n d e j o", " p e n d e j a", " p e n d e j o s", " p e n d e j a s",
+    "cabron", "cabrona", "cabrones",
+
     "bobo", "boba", "tarado", "tarada", "idiota", "idiotas",
     "imbecil", "imbeciles", "baboso", "babosa",
     "bitch", "shit", "fuck", "haypendejo", "hay pendejo", "hay pendeja", "hay cabron", "hay cabrona", "hay culero", "hay culera", "hay mierda", "hay puto", "hay puta", "hay verga", "hay mamon", "hay mamona", "hay buey", "hay guey", "hay wey", "hay bobo", "hay boba", "hay tarado", "hay tarada", "hay idiota", "hay idiotas",
@@ -235,10 +237,31 @@ function crearColoresLetrasPC(texto) {
     }).join('');
 }
 
-// Limpieza general automática
+// Limpieza general automática despues de 10 minutos para evitar acumulación excesiva de elementos en el DOM, especialmente en móviles
 setInterval(() => {
     const frases = document.querySelectorAll('.frase-animada');
     frases.forEach(frase => frase.remove());
-}, 600000);
+}, 600000); // 600000 ms = 10 minutos
 
-//animacion de los mensajes en el movil desbanescando y apareciendo suavemente
+// desamontonar las frases en móviles cada 30 segundos para evitar superposición excesiva
+setInterval(() => {
+    if (window.innerWidth <= 600) {
+        const frases = document.querySelectorAll('.frase-animada');
+        frases.forEach(frase => frase.remove());
+    }
+}, 30000); // 30000 ms = 30 segundos
+
+// Escuchar cambios de tamaño para ajustar la visualización en tiempo real
+window.addEventListener('resize', () => {
+    const esMovil = window.innerWidth <= 600;
+    const frases = document.querySelectorAll('.frase-animada');
+    frases.forEach(frase => {
+        if (esMovil) {
+            frase.style.whiteSpace = 'nowrap';  
+            frase.style.display = 'inline-block';
+        } else {
+            frase.style.whiteSpace = 'normal';  
+            frase.style.display = 'block';
+        }   
+    });
+});
