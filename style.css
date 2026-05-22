@@ -353,3 +353,93 @@ button:hover {
     animation: aparecerFosforo 6s ease-in-out infinite; /* Se cambió 'forwards' por 'infinite' y subió a 6s para mayor suavidad */
     pointer-events: none;
 }
+
+/* ==========================================
+   ANIMACIONES DE OCULTAR / MOSTRAR TARJETA
+   ========================================== */
+
+/* Clase que se aplicará para ocultar la tarjeta deslizándose a la derecha */
+.contenedor-principal.deslizar-ocultar {
+    animation: deslizarDerecha 0.5s ease-in-out forwards;
+    pointer-events: none; /* Evita que bloquee clics estando invisible */
+}
+
+@keyframes deslizarDerecha {
+    0% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(120%) scale(0.9);
+        opacity: 0;
+        display: none; /* Lo saca del flujo visual */
+    }
+}
+
+/* Clase para cuando la tarjeta vuelva a aparecer */
+.contenedor-principal.deslizar-mostrar {
+    display: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: deslizarIzquierda 0.5s ease-in-out forwards;
+}
+
+@keyframes deslizarIzquierda {
+    0% {
+        transform: translateX(-120%) scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Botón flotante inferior para reabrir el formulario */
+.btn-abrir {
+    position: fixed;
+    bottom: 20px;
+    z-index: 100;
+    padding: 12px 24px;
+    background-color: #e94560;
+    color: white;
+    border: none;
+    border-radius: 25px; /* Bordes redondeados tipo píldora */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+    transition: transform 0.3s, background-color 0.3s;
+}
+
+.btn-abrir:hover {
+    background-color: #ff5270;
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .frase-animada {
+        position: absolute;
+        font-size: 1.4rem;
+        font-weight: bold;
+        white-space: nowrap;
+        /* Llama a la animación de desvanecimiento, dura 6 segundos y se repite eternamente */
+        animation: desvanecerFosforo 6s ease-in-out infinite;
+        pointer-events: none;
+        opacity: 0; /* Inicia invisible para esperar el tiempo de delay del JS */
+    }
+
+    /* Animación pura de opacidad para que aparezcan y desaparezcan en el mismo sitio */
+    @keyframes desvanecerFosforo {
+        0% {
+            opacity: 0;
+        }
+        20% {
+            opacity: 1;
+        }
+        80% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+}
