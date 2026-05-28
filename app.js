@@ -28,73 +28,55 @@ const database = firebase.database();
 const palabrasNegativas = [
 
     // Español
-    "pendejo","pendeja","pendejos","pendejas",
-    "cabron","cabrona","cabrones",
-    "culero","culera","culeros",
-    "puta","puto","putas","putos",
-    "chingar","chingada","chingado","chingados",
-    "mierda","mierdas",
-    "verga","vergas",
-    "mamon","mamona","mamones",
-    "idiota","idiotas",
-    "imbecil","imbeciles",
-    "tarado","tarada",
-    "baboso","babosa",
-    "estupido","estupida",
-    "asco",
-    "culo",
-    "cagar",
-    "cagada",
-    "cagado",
-    "meco","mecos",
-    "riata",
-    "pito",
+    "pendejo",
+    "pendeja",
+    "cabron",
+    "cabrona",
+    "culero",
+    "culera",
+    "puta",
+    "puto",
+    "chingar",
+    "chingada",
+    "chingado",
+    "mierda",
+    "verga",
+    "mamon",
+    "idiota",
+    "imbecil",
+    "tarado",
+    "baboso",
+    "estupido",
     "pinche",
     "ojete",
-    "hocicon",
     "naco",
     "perra",
     "zorra",
     "maricon",
-    "maricones",
     "joto",
-    "jotos",
     "puñetas",
     "chaqueto",
 
-    // Frases
+    // frases
     "puta madre",
     "hijo de puta",
     "hijo de la chingada",
     "chinga tu madre",
     "vete a la verga",
     "no mames",
-    "valeverga",
-    "valemadre",
-    "chingatumadre",
-    "hijodeputa",
-    "hijodelachingada",
-    "maldita sea",
-    "maldito cabron",
-    "maldito pendejo",
-    "maldito culero",
 
-    // Inglés
+    // inglés
     "fuck",
     "fucker",
     "motherfucker",
     "bitch",
     "asshole",
-    "piece of shit",
     "dumbass",
-    "son of a bitch",
-    "bastard",
-    "dickhead",
-    "prick"
+    "bastard"
 ];
 
 // ===============================================
-// NORMALIZAR TEXTO
+// NORMALIZACIÓN EXTREMA
 // ===============================================
 
 function normalizarTexto(texto) {
@@ -121,7 +103,32 @@ function normalizarTexto(texto) {
         '+':'t',
         '#':'h',
         '%':'x',
-        '&':'y'
+        '&':'y',
+        '*':'',
+        '_':'',
+        '-':'',
+        '.':'',
+        ',':'',
+        ';':'',
+        ':':'',
+        '(':'',
+        ')':'',
+        '[':'',
+        ']':'',
+        '{':'',
+        '}':'',
+        '=':'',
+        '?':'',
+        '¿':'',
+        '¡':'',
+        '/':'',
+        '\\':'',
+        '"':'',
+        "'":'',
+        '<':'',
+        '>':'',
+        '~':'',
+        '`':''
     };
 
     texto = texto.toLowerCase();
@@ -129,7 +136,7 @@ function normalizarTexto(texto) {
     // reemplazar caracteres
     texto = texto
         .split('')
-        .map(c => reemplazos[c] || c)
+        .map(c => reemplazos[c] ?? c)
         .join('');
 
     // quitar acentos
@@ -137,10 +144,10 @@ function normalizarTexto(texto) {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
 
-    // quitar caracteres especiales
+    // quitar emojis y basura
     texto = texto.replace(/[^a-z]/g, '');
 
-    // compactar letras repetidas
+    // quitar letras repetidas
     texto = texto.replace(/(.)\1+/g, '$1');
 
     return texto;
@@ -152,41 +159,30 @@ function normalizarTexto(texto) {
 
 function verificarMensaje(mensajeUsuario) {
 
-    let textoLimpio = normalizarTexto(mensajeUsuario);
+    const textoLimpio =
+        normalizarTexto(mensajeUsuario);
 
-    textoLimpio = textoLimpio.replace(/\s+/g, '');
-
-    // regex avanzados
-    const patrones = [
-
-        /p+[^a-z]*e+[^a-z]*n+[^a-z]*d+[^a-z]*e+[^a-z]*j+[^a-z]*o+/,
-        /c+[^a-z]*a+[^a-z]*b+[^a-z]*r+[^a-z]*o+[^a-z]*n+/,
-        /c+[^a-z]*h+[^a-z]*i+[^a-z]*n+[^a-z]*g+[^a-z]*a+/,
-        /v+[^a-z]*e+[^a-z]*r+[^a-z]*g+[^a-z]*a+/,
-        /p+[^a-z]*u+[^a-z]*t+[^a-z]*a+/,
-        /p+[^a-z]*u+[^a-z]*t+[^a-z]*o+/,
-        /m+[^a-z]*i+[^a-z]*e+[^a-z]*r+[^a-z]*d+[^a-z]*a+/,
-        /c+[^a-z]*u+[^a-z]*l+[^a-z]*e+[^a-z]*r+[^a-z]*o+/,
-        /m+[^a-z]*a+[^a-z]*m+[^a-z]*o+[^a-z]*n+/,
-        /f+[^a-z]*u+[^a-z]*c+[^a-z]*k+/,
-        /b+[^a-z]*i+[^a-z]*t+[^a-z]*c+[^a-z]*h+/,
-        /a+[^a-z]*s+[^a-z]*s+[^a-z]*h+[^a-z]*o+[^a-z]*l+[^a-z]*e+/
-    ];
-
-    // revisar regex
-    for (const regex of patrones) {
-
-        if (regex.test(textoLimpio)) {
-            return true;
-        }
-    }
-
-    // revisar lista
     for (const palabra of palabrasNegativas) {
 
-        const limpia = normalizarTexto(palabra);
+        const palabraLimpia =
+            normalizarTexto(palabra);
 
-        if (textoLimpio.includes(limpia)) {
+        // detección directa
+        if (textoLimpio.includes(palabraLimpia)) {
+            return true;
+        }
+
+        // regex extremo flexible
+        const regex = new RegExp(
+
+            palabraLimpia
+                .split('')
+                .join('.*'),
+
+            'i'
+        );
+
+        if (regex.test(textoLimpio)) {
             return true;
         }
     }
@@ -195,7 +191,7 @@ function verificarMensaje(mensajeUsuario) {
 }
 
 // ===============================================
-// VALIDAR FRASE POSITIVA
+// VALIDAR FRASE
 // ===============================================
 
 function esFrasePositiva(texto) {
@@ -238,14 +234,15 @@ const clasesFosforo = [
 ];
 
 // ===============================================
-// FORMULARIO
+// VALIDACIÓN FORMULARIO
 // ===============================================
 
 formulario.addEventListener('submit', (e) => {
 
     e.preventDefault();
 
-    const textoMensaje = entrada.value.trim();
+    const textoMensaje =
+        entrada.value.trim();
 
     // vacío
     if (textoMensaje === "") {
@@ -259,10 +256,10 @@ formulario.addEventListener('submit', (e) => {
     }
 
     // bloquear números y símbolos
-    const contieneCaracteresInvalidos =
-        /[^a-zA-ZáéíóúÁÉÍÓÚ\s]/.test(textoMensaje);
+    const caracteresInvalidos =
+        /[0-9@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]/;
 
-    if (contieneCaracteresInvalidos) {
+    if (caracteresInvalidos.test(textoMensaje)) {
 
         mensajeError.innerText =
             "No se permiten números ni caracteres especiales";
@@ -295,13 +292,19 @@ formulario.addEventListener('submit', (e) => {
     entrada.value = '';
 
     // animación
-    tarjetaPrincipal.classList.remove('deslizar-mostrar');
+    tarjetaPrincipal.classList.remove(
+        'deslizar-mostrar'
+    );
 
-    tarjetaPrincipal.classList.add('deslizar-ocultar');
+    tarjetaPrincipal.classList.add(
+        'deslizar-ocultar'
+    );
 
     setTimeout(() => {
 
-        btnAbrirFormulario.classList.remove('oculto');
+        btnAbrirFormulario
+            .classList
+            .remove('oculto');
 
     }, 400);
 });
@@ -314,21 +317,29 @@ btnAbrirFormulario.addEventListener('click', () => {
 
     btnAbrirFormulario.classList.add('oculto');
 
-    tarjetaPrincipal.classList.remove('deslizar-ocultar');
+    tarjetaPrincipal.classList.remove(
+        'deslizar-ocultar'
+    );
 
-    tarjetaPrincipal.classList.add('deslizar-mostrar');
+    tarjetaPrincipal.classList.add(
+        'deslizar-mostrar'
+    );
 });
 
 // ===============================================
-// FIREBASE TIEMPO REAL
+// FIREBASE REALTIME
 // ===============================================
 
-database.ref('frases').on('child_added', (snapshot) => {
+database
+    .ref('frases')
+    .on('child_added', (snapshot) => {
 
-    const datos = snapshot.val();
+        const datos = snapshot.val();
 
-    procesarDistribuciónFrase(datos.texto);
-});
+        procesarDistribuciónFrase(
+            datos.texto
+        );
+    });
 
 // ===============================================
 // DISTRIBUIR FRASES
@@ -336,11 +347,15 @@ database.ref('frases').on('child_added', (snapshot) => {
 
 function procesarDistribuciónFrase(texto) {
 
-    const esMovil = window.innerWidth <= 600;
+    const esMovil =
+        window.innerWidth <= 600;
 
     if (esMovil) {
 
-        if (texto.trim() !== "" && texto.includes(' ')) {
+        if (
+            texto.trim() !== "" &&
+            texto.includes(' ')
+        ) {
 
             crearFraseAleatoriaMovil(texto);
         }
@@ -360,28 +375,42 @@ function crearFraseAleatoriaMovil(fraseCompleta) {
     const elementoFrase =
         document.createElement('div');
 
-    elementoFrase.classList.add('frase-animada');
+    elementoFrase.classList.add(
+        'frase-animada'
+    );
 
-    elementoFrase.innerText = fraseCompleta;
+    elementoFrase.innerText =
+        fraseCompleta;
 
-    elementoFrase.style.whiteSpace = 'nowrap';
+    elementoFrase.style.whiteSpace =
+        'nowrap';
 
-    elementoFrase.style.display = 'inline-block';
+    elementoFrase.style.display =
+        'inline-block';
 
-    cambiarColorYPosicion(elementoFrase);
+    cambiarColorYPosicion(
+        elementoFrase
+    );
 
-    const retraso = Math.random() * 5;
+    const retraso =
+        Math.random() * 5;
 
-    elementoFrase.style.animationDelay = `${retraso}s`;
+    elementoFrase.style.animationDelay =
+        `${retraso}s`;
 
     elementoFrase.addEventListener(
         'animationiteration',
         () => {
-            cambiarColorYPosicion(elementoFrase);
+
+            cambiarColorYPosicion(
+                elementoFrase
+            );
         }
     );
 
-    contenedorFondo.appendChild(elementoFrase);
+    contenedorFondo.appendChild(
+        elementoFrase
+    );
 }
 
 // ===============================================
@@ -402,17 +431,25 @@ function cambiarColorYPosicion(elemento) {
             )
         ];
 
-    elemento.classList.add(claseColorAleatorio);
+    elemento.classList.add(
+        claseColorAleatorio
+    );
 
     const posicionX =
-        Math.floor(Math.random() * 45) + 5;
+        Math.floor(
+            Math.random() * 45
+        ) + 5;
 
     const posicionY =
-        Math.floor(Math.random() * 80) + 5;
+        Math.floor(
+            Math.random() * 80
+        ) + 5;
 
-    elemento.style.left = `${posicionX}%`;
+    elemento.style.left =
+        `${posicionX}%`;
 
-    elemento.style.top = `${posicionY}%`;
+    elemento.style.top =
+        `${posicionY}%`;
 }
 
 // ===============================================
@@ -424,21 +461,30 @@ function crearFraseEnPantallaPC(texto) {
     const elementoFrase =
         document.createElement('div');
 
-    elementoFrase.classList.add('frase-animada');
+    elementoFrase.classList.add(
+        'frase-animada'
+    );
 
     elementoFrase.innerHTML =
         crearColoresLetrasPC(texto);
 
     const posicionX =
-        Math.floor(Math.random() * 80) + 5;
+        Math.floor(
+            Math.random() * 80
+        ) + 5;
 
-    elementoFrase.style.left = `${posicionX}%`;
+    elementoFrase.style.left =
+        `${posicionX}%`;
 
-    const retraso = Math.random() * 2;
+    const retraso =
+        Math.random() * 2;
 
-    elementoFrase.style.animationDelay = `${retraso}s`;
+    elementoFrase.style.animationDelay =
+        `${retraso}s`;
 
-    contenedorFondo.appendChild(elementoFrase);
+    contenedorFondo.appendChild(
+        elementoFrase
+    );
 
     setTimeout(() => {
 
@@ -454,6 +500,7 @@ function crearFraseEnPantallaPC(texto) {
 function crearColoresLetrasPC(texto) {
 
     const colores = [
+
         '#ff6b6b',
         '#feca57',
         '#48dbfb',
@@ -461,25 +508,28 @@ function crearColoresLetrasPC(texto) {
         '#5f27cd'
     ];
 
-    return texto.split('').map(letra => {
+    return texto
+        .split('')
+        .map(letra => {
 
-        const colorAleatorio =
-            colores[
-                Math.floor(
-                    Math.random() *
-                    colores.length
-                )
-            ];
+            const colorAleatorio =
+                colores[
+                    Math.floor(
+                        Math.random() *
+                        colores.length
+                    )
+                ];
 
-        return `
-            <span style="
-                color:${colorAleatorio};
-                font-weight:bold;
-            ">
-                ${letra}
-            </span>
-        `;
-    }).join('');
+            return `
+                <span style="
+                    color:${colorAleatorio};
+                    font-weight:bold;
+                ">
+                    ${letra}
+                </span>
+            `;
+        })
+        .join('');
 }
 
 // ===============================================
@@ -489,9 +539,13 @@ function crearColoresLetrasPC(texto) {
 setInterval(() => {
 
     const frases =
-        document.querySelectorAll('.frase-animada');
+        document.querySelectorAll(
+            '.frase-animada'
+        );
 
-    frases.forEach(frase => frase.remove());
+    frases.forEach(frase =>
+        frase.remove()
+    );
 
 }, 600000);
 
@@ -504,9 +558,13 @@ setInterval(() => {
     if (window.innerWidth <= 600) {
 
         const frases =
-            document.querySelectorAll('.frase-animada');
+            document.querySelectorAll(
+                '.frase-animada'
+            );
 
-        frases.forEach(frase => frase.remove());
+        frases.forEach(frase =>
+            frase.remove()
+        );
     }
 
 }, 30000);
@@ -517,24 +575,31 @@ setInterval(() => {
 
 window.addEventListener('resize', () => {
 
-    const esMovil = window.innerWidth <= 600;
+    const esMovil =
+        window.innerWidth <= 600;
 
     const frases =
-        document.querySelectorAll('.frase-animada');
+        document.querySelectorAll(
+            '.frase-animada'
+        );
 
     frases.forEach(frase => {
 
         if (esMovil) {
 
-            frase.style.whiteSpace = 'nowrap';
+            frase.style.whiteSpace =
+                'nowrap';
 
-            frase.style.display = 'inline-block';
+            frase.style.display =
+                'inline-block';
 
         } else {
 
-            frase.style.whiteSpace = 'normal';
+            frase.style.whiteSpace =
+                'normal';
 
-            frase.style.display = 'block';
+            frase.style.display =
+                'block';
         }
     });
 });
