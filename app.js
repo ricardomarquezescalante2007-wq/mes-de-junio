@@ -14,94 +14,251 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // Tu lista base se mantiene limpia y manejable
-const palabrasNegativas = [
-    "malo", "horrible", "feo", "terrible", "odioso", "desagradable", "horrendo", "asqueroso",
-    "maldito", "pésimo", "decepcionante", "desastroso", "nefasto", "lamentable", "tonto", "basura", "estupido", "morir", "asco",
-    "pendejo", "pendeja", "pendejos", "pendejas",
-    "chingar", "chingada", "chingado", "chingaderas", "chingon", "chingo",
-    "cabron", "cabrona", "cabrones",
-    "culero", "culera", "culeros", "culo",
-    "mierda", "mierdas", "cagado", "cagar", "cagada",
-    "puto", "puta", "putitos", "putitas", "putazos",
-    "pito", "verga", "vergas", "riata", "meco", "mecos",
-    "mamon", "mamona", "mamar", "mamadas", "p u t o", 
-    "buey", "guey", "wey", " p e n d e j o", " p e n d e j a", " p e n d e j o s", " p e n d e j a s",
-    "cabron", "cabrona", "cabrones",
+// ===============================================
+// FILTRO AVANZADO DE GROSERÍAS Y EVASIONES
+// ===============================================
 
-    "bobo", "boba", "tarado", "tarada", "idiota", "idiotas",
-    "imbecil", "imbeciles", "baboso", "babosa",
-    "bitch", "shit", "fuck", "haypendejo", "hay pendejo", "hay pendeja", "hay cabron", "hay cabrona", "hay culero", "hay culera", "hay mierda", "hay puto", "hay puta", "hay verga", "hay mamon", "hay mamona", "hay buey", "hay guey", "hay wey", "hay bobo", "hay boba", "hay tarado", "hay tarada", "hay idiota", "hay idiotas",
-    "hay imbecil", "hay imbeciles", "hay baboso", "hay babosa", "gay", "lesbiana", "maricon", "maricón", "maricones", "mariconas",
-    "puta madre", "puta que te pario", "hijo de puta", "hijo de la chingada", "cabrón de mierda", "pendejo de mierda", "culero de mierda", "chingada madre", "chingada que te pario", "chingada tu madre",
-    "maldita sea", "maldita madre", "maldito sea", "maldito hijo de puta", "maldito cabrón", "maldito pendejo", "maldito culero", "maldita chingada",
-    "te voy a matar", "te voy a matar hijo de puta", "te voy a matar cabrón", "te voy a matar pendejo", "te voy a matar culero", "te voy a matar mierda",
-    //frases en ingles ofensibas
-    "you are an idiot", "you are a moron", "you are a fool", "you are stupid", "you are dumb", "you are a jerk", "you are a loser", "you are a piece of shit"
-    , "you are a   bitch", "you are a fucker", "you are a motherfucker", "you are a son of a   bitch", "you are a bastard", "you are a douchebag", "you are a prick", "you are a   dickhead", "you are a pussy", "you are a wimp", "you are a weakling", "you are a scumbag", "you are a creep", "you are a pervert", "you are a pig",
-    "you are a"
-    // Agrega más palabras según sea necesario
+// LISTA DE PALABRAS Y FRASES OFENSIVAS
+const palabrasNegativas = [
+
+    // insultos comunes
+    "pendejo", "pendeja", "pendejos", "pendejas",
+    "cabron", "cabrona", "cabrones",
+    "culero", "culera", "culeros",
+    "puta", "puto", "putas", "putos",
+    "chingar", "chingada", "chingado", "chingados",
+    "mierda", "mierdas",
+    "verga", "vergas",
+    "mamon", "mamona", "mamones",
+    "idiota", "idiotas",
+    "imbecil", "imbeciles",
+    "tarado", "tarada",
+    "baboso", "babosa",
+    "estupido", "estupida",
+    "asco",
+    "culo",
+    "cagar",
+    "cagada",
+    "cagado",
+    "meco", "mecos",
+    "riata",
+    "pito",
+    "pinche",
+    "ojete",
+    "hocicon",
+    "naco",
+    "perra",
+    "zorra",
+    "maricon",
+    "maricones",
+    "joto",
+    "jotos",
+    "puñetas",
+    "chaqueto",
+    "gay",
+    "lesbiana",
+
+    // frases ofensivas
+    "puta madre",
+    "hijo de puta",
+    "hijo de la chingada",
+    "chinga tu madre",
+    "vete a la verga",
+    "vete al diablo",
+    "me vale madre",
+    "no mames",
+    "valeverga",
+    "valemadre",
+    "chingatumadre",
+    "hijodeputa",
+    "hijodelachingada",
+    "maldita sea",
+    "maldito cabron",
+    "maldito pendejo",
+    "maldito culero",
+    "te voy a matar",
+
+    // inglés
+    "fuck",
+    "fucker",
+    "motherfucker",
+    "bitch",
+    "asshole",
+    "piece of shit",
+    "dumbass",
+    "son of a bitch",
+    "bastard",
+    "jerk",
+    "moron",
+    "loser",
+    "dickhead",
+    "prick",
+    "scumbag",
+    "creep",
+    "pervert",
+    "pig"
 ];
 
-// Función para transformar los intentos de evasión a texto plano
+// ===============================================
+// REEMPLAZOS DE LETRAS, NÚMEROS Y SÍMBOLOS
+// ===============================================
+
+const reemplazos = {
+
+    // números
+    '0': 'o',
+    '1': 'i',
+    '2': 'z',
+    '3': 'e',
+    '4': 'a',
+    '5': 's',
+    '6': 'g',
+    '7': 't',
+    '8': 'b',
+    '9': 'g',
+
+    // símbolos
+    '@': 'a',
+    '$': 's',
+    '+': 't',
+    '!': 'i',
+    '|': 'i',
+    '#': 'h',
+    '%': 'x',
+    '&': 'y',
+    '*': '',
+    '_': '',
+    '-': '',
+    '.': '',
+    ',': '',
+    ';': '',
+    ':': '',
+    '(': '',
+    ')': '',
+    '[': '',
+    ']': '',
+    '{': '',
+    '}': '',
+    '=': '',
+    '?': '',
+    '¿': '',
+    '¡': '',
+    '/': '',
+    '\\': '',
+    '"': '',
+    "'": '',
+    '<': '',
+    '>': ''
+};
+
+// ===============================================
+// FUNCIÓN PARA NORMALIZAR TEXTO
+// ===============================================
+
 function normalizarTexto(texto) {
-    return texto
-        .toLowerCase()
-        // Reemplaza números comunes de leetspeak por letras
-        .replace(/4/g, 'a')
-        .replace(/3/g, 'e')
-        .replace(/1/g, 'i')
-        .replace(/0/g, 'o')
-        .replace(/5/g, 's')
-        .replace(/7/g, 't')
-        .replace(/8/g, 'b')
-        // Reemplaza símbolos que imitan letras
-        .replace(/@/g, 'a')
-        .replace(/\$/g, 's')
-        // Elimina acentos y diéresis
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        // Elimina puntos, espacios intermedios, guiones y cualquier carácter especial para juntar las letras
-        .replace(/[^a-z]/g, "");
+
+    texto = texto.toLowerCase();
+
+    // sustituir números y símbolos
+    texto = texto
+        .split('')
+        .map(caracter => reemplazos[caracter] || caracter)
+        .join('');
+
+    // eliminar acentos
+    texto = texto
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+    // eliminar cualquier caracter raro
+    texto = texto.replace(/[^a-z]/g, '');
+
+    // reducir letras repetidas
+    // ej: puuuutooo => puto
+    texto = texto.replace(/(.)\1+/g, '$1');
+
+    return texto;
 }
 
-// funcion para remplazar simbolos en palabras de ingles ofensivas
-function normalizarTextoIngles(texto) {
-    return texto
-        .toLowerCase()
-        // Reemplaza números comunes de leetspeak por letras
-        .replace(/4/g, 'a')
-        .replace(/3/g, 'e')
-        .replace(/1/g, 'i')
-        .replace(/0/g, 'o')
-        .replace(/5/g, 's')
-        .replace(/7/g, 't')
-        .replace(/8/g, 'b')
-        // Reemplaza símbolos que imitan letras
-        .replace(/@/g, 'a')
-        .replace(/\$/g, 's')
-        // Elimina acentos y diéresis
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        // Elimina puntos, espacios intermedios, guiones y cualquier carácter especial para juntar las letras
-        .replace(/[^a-z]/g, "");
-}
+// ===============================================
+// FUNCIÓN PRINCIPAL
+// ===============================================
 
-// Ejemplo de uso:
 function verificarMensaje(mensajeUsuario) {
+
     const textoLimpio = normalizarTexto(mensajeUsuario);
-    
-    // Verifica si alguna de las palabras prohibidas está contenida en el texto procesado
+
+    // revisar lista normal
     const contieneGroseria = palabrasNegativas.some(palabra => {
+
         const palabraLimpia = normalizarTexto(palabra);
+
         return textoLimpio.includes(palabraLimpia);
     });
 
-    return contieneGroseria;
+    // revisar patrones regex avanzados
+    const patrones = [
+
+        /p+e+n+d+e+j+o+/,
+        /c+a+b+r+o+n+/,
+        /c+h+i+n+g+a+/,
+        /v+e+r+g+a+/,
+        /p+u+t+o+/,
+        /m+i+e+r+d+a+/,
+        /c+u+l+e+r+o+/,
+        /m+a+m+o+n+/,
+        /i+d+i+o+t+a+/,
+        /f+u+c+k+/,
+        /b+i+t+c+h+/,
+        /a+s+s+h+o+l+e+/,
+        /m+o+t+h+e+r+f+u+c+k+e+r+/
+    ];
+
+    const contieneRegex = patrones.some(regex =>
+        regex.test(textoLimpio)
+    );
+
+    return contieneGroseria || contieneRegex;
 }
 
-// Pruebas que el sistema detectará con éxito:
-console.log(verificarMensaje("Eres un p3nd3j0")); // true (Detecta pendejo)
-console.log(verificarMensaje("M.I.E.R.D.A"));     // true (Detecta mierda)
-console.log(verificarMensaje("C@br0n"));         // true (Detecta cabron)
+// ===============================================
+// PRUEBAS
+// ===============================================
 
+const pruebas = [
+
+    "Eres un pendejo",
+    "Eres un p3nd3j0",
+    "C@br0n",
+    "vete a la v3rg4",
+    "No m@m3s",
+    "M.I.E.R.D.A",
+    "puuuuutoooo",
+    "Ch1ng4 tu m4dr3",
+    "motherfucker",
+    "f.u.c.k",
+    "assh0le",
+    "pppeeennndeeejooo",
+    "c h i n g a d a",
+    "v e r g a",
+    "p#t0",
+    "idi0t4",
+    "b1tch",
+    "dumb4ss"
+];
+
+// ===============================================
+// RESULTADOS
+// ===============================================
+
+pruebas.forEach(texto => {
+
+    console.log(
+        `"${texto}" =>`,
+        verificarMensaje(texto)
+    );
+
+});
 // Elementos del DOM
 const formulario = document.getElementById('formulario-mensaje');
 const entrada = document.getElementById('entrada-mensaje');
