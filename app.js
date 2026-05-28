@@ -13,12 +13,16 @@ const firebaseConfig = {
     appId: "1:550796933344:web:b2bd6f438e9a3c3dbd7885"
 };
 
-// Inicializar Firebase
+// ===============================================
+// INICIALIZAR FIREBASE
+// ===============================================
+
 firebase.initializeApp(firebaseConfig);
+
 const database = firebase.database();
 
 // ===============================================
-// LISTA DE PALABRAS OFENSIVAS
+// PALABRAS PROHIBIDAS
 // ===============================================
 
 const palabrasNegativas = [
@@ -57,8 +61,6 @@ const palabrasNegativas = [
     "jotos",
     "puñetas",
     "chaqueto",
-    "gay",
-    "lesbiana",
 
     // Frases
     "puta madre",
@@ -66,8 +68,6 @@ const palabrasNegativas = [
     "hijo de la chingada",
     "chinga tu madre",
     "vete a la verga",
-    "vete al diablo",
-    "me vale madre",
     "no mames",
     "valeverga",
     "valemadre",
@@ -78,7 +78,6 @@ const palabrasNegativas = [
     "maldito cabron",
     "maldito pendejo",
     "maldito culero",
-    "te voy a matar",
 
     // Inglés
     "fuck",
@@ -90,19 +89,12 @@ const palabrasNegativas = [
     "dumbass",
     "son of a bitch",
     "bastard",
-    "jerk",
-    "moron",
-    "loser",
     "dickhead",
-    "prick",
-    "scumbag",
-    "creep",
-    "pervert",
-    "pig"
+    "prick"
 ];
 
 // ===============================================
-// NORMALIZACIÓN EXTREMA
+// NORMALIZAR TEXTO
 // ===============================================
 
 function normalizarTexto(texto) {
@@ -134,7 +126,7 @@ function normalizarTexto(texto) {
 
     texto = texto.toLowerCase();
 
-    // sustituir caracteres
+    // reemplazar caracteres
     texto = texto
         .split('')
         .map(c => reemplazos[c] || c)
@@ -145,7 +137,7 @@ function normalizarTexto(texto) {
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
 
-    // eliminar caracteres especiales
+    // quitar caracteres especiales
     texto = texto.replace(/[^a-z]/g, '');
 
     // compactar letras repetidas
@@ -155,7 +147,7 @@ function normalizarTexto(texto) {
 }
 
 // ===============================================
-// DETECCIÓN DE GROSERÍAS
+// DETECTOR DE GROSERÍAS
 // ===============================================
 
 function verificarMensaje(mensajeUsuario) {
@@ -164,7 +156,7 @@ function verificarMensaje(mensajeUsuario) {
 
     textoLimpio = textoLimpio.replace(/\s+/g, '');
 
-    // REGEX EXTREMOS
+    // regex avanzados
     const patrones = [
 
         /p+[^a-z]*e+[^a-z]*n+[^a-z]*d+[^a-z]*e+[^a-z]*j+[^a-z]*o+/,
@@ -176,18 +168,14 @@ function verificarMensaje(mensajeUsuario) {
         /m+[^a-z]*i+[^a-z]*e+[^a-z]*r+[^a-z]*d+[^a-z]*a+/,
         /c+[^a-z]*u+[^a-z]*l+[^a-z]*e+[^a-z]*r+[^a-z]*o+/,
         /m+[^a-z]*a+[^a-z]*m+[^a-z]*o+[^a-z]*n+/,
-        /i+[^a-z]*d+[^a-z]*i+[^a-z]*o+[^a-z]*t+[^a-z]*a+/,
-        /m+[^a-z]*a+[^a-z]*r+[^a-z]*i+[^a-z]*c+[^a-z]*o+[^a-z]*n+/,
-        /j+[^a-z]*o+[^a-z]*t+[^a-z]*o+/,
-        /p+[^a-z]*i+[^a-z]*n+[^a-z]*c+[^a-z]*h+[^a-z]*e+/,
         /f+[^a-z]*u+[^a-z]*c+[^a-z]*k+/,
         /b+[^a-z]*i+[^a-z]*t+[^a-z]*c+[^a-z]*h+/,
-        /a+[^a-z]*s+[^a-z]*s+[^a-z]*h+[^a-z]*o+[^a-z]*l+[^a-z]*e+/,
-        /m+[^a-z]*o+[^a-z]*t+[^a-z]*h+[^a-z]*e+[^a-z]*r+[^a-z]*f+[^a-z]*u+[^a-z]*c+[^a-z]*k+[^a-z]*e+[^a-z]*r+/
+        /a+[^a-z]*s+[^a-z]*s+[^a-z]*h+[^a-z]*o+[^a-z]*l+[^a-z]*e+/
     ];
 
     // revisar regex
     for (const regex of patrones) {
+
         if (regex.test(textoLimpio)) {
             return true;
         }
@@ -211,6 +199,7 @@ function verificarMensaje(mensajeUsuario) {
 // ===============================================
 
 function esFrasePositiva(texto) {
+
     return !verificarMensaje(texto);
 }
 
@@ -218,12 +207,27 @@ function esFrasePositiva(texto) {
 // ELEMENTOS DOM
 // ===============================================
 
-const formulario = document.getElementById('formulario-mensaje');
-const entrada = document.getElementById('entrada-mensaje');
-const mensajeError = document.getElementById('mensaje-error');
-const contenedorFondo = document.getElementById('fondo-frases');
-const tarjetaPrincipal = document.querySelector('.contenedor-principal');
-const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
+const formulario =
+    document.getElementById('formulario-mensaje');
+
+const entrada =
+    document.getElementById('entrada-mensaje');
+
+const mensajeError =
+    document.getElementById('mensaje-error');
+
+const contenedorFondo =
+    document.getElementById('fondo-frases');
+
+const tarjetaPrincipal =
+    document.querySelector('.contenedor-principal');
+
+const btnAbrirFormulario =
+    document.getElementById('btn-abrir-formulario');
+
+// ===============================================
+// COLORES
+// ===============================================
 
 const clasesFosforo = [
     'fosforo-verde',
@@ -234,7 +238,7 @@ const clasesFosforo = [
 ];
 
 // ===============================================
-// ENVÍO FORMULARIO
+// FORMULARIO
 // ===============================================
 
 formulario.addEventListener('submit', (e) => {
@@ -243,13 +247,32 @@ formulario.addEventListener('submit', (e) => {
 
     const textoMensaje = entrada.value.trim();
 
+    // vacío
     if (textoMensaje === "") {
-        mensajeError.innerText = "Escribe un mensaje";
+
+        mensajeError.innerText =
+            "Escribe un mensaje";
+
         mensajeError.classList.remove('oculto');
+
         return;
     }
 
-    // DETECTAR GROSERÍAS
+    // bloquear números y símbolos
+    const contieneCaracteresInvalidos =
+        /[^a-zA-ZáéíóúÁÉÍÓÚ\s]/.test(textoMensaje);
+
+    if (contieneCaracteresInvalidos) {
+
+        mensajeError.innerText =
+            "No se permiten números ni caracteres especiales";
+
+        mensajeError.classList.remove('oculto');
+
+        return;
+    }
+
+    // bloquear groserías
     if (!esFrasePositiva(textoMensaje)) {
 
         mensajeError.innerText =
@@ -262,8 +285,9 @@ formulario.addEventListener('submit', (e) => {
 
     mensajeError.classList.add('oculto');
 
-    // GUARDAR FIREBASE
+    // guardar firebase
     database.ref('frases').push({
+
         texto: textoMensaje,
         timestamp: Date.now()
     });
@@ -272,10 +296,13 @@ formulario.addEventListener('submit', (e) => {
 
     // animación
     tarjetaPrincipal.classList.remove('deslizar-mostrar');
+
     tarjetaPrincipal.classList.add('deslizar-ocultar');
 
     setTimeout(() => {
+
         btnAbrirFormulario.classList.remove('oculto');
+
     }, 400);
 });
 
@@ -293,7 +320,7 @@ btnAbrirFormulario.addEventListener('click', () => {
 });
 
 // ===============================================
-// FIREBASE REALTIME
+// FIREBASE TIEMPO REAL
 // ===============================================
 
 database.ref('frases').on('child_added', (snapshot) => {
@@ -304,7 +331,7 @@ database.ref('frases').on('child_added', (snapshot) => {
 });
 
 // ===============================================
-// DISTRIBUCIÓN FRASES
+// DISTRIBUIR FRASES
 // ===============================================
 
 function procesarDistribuciónFrase(texto) {
@@ -314,6 +341,7 @@ function procesarDistribuciónFrase(texto) {
     if (esMovil) {
 
         if (texto.trim() !== "" && texto.includes(' ')) {
+
             crearFraseAleatoriaMovil(texto);
         }
 
@@ -329,13 +357,15 @@ function procesarDistribuciónFrase(texto) {
 
 function crearFraseAleatoriaMovil(fraseCompleta) {
 
-    const elementoFrase = document.createElement('div');
+    const elementoFrase =
+        document.createElement('div');
 
     elementoFrase.classList.add('frase-animada');
 
     elementoFrase.innerText = fraseCompleta;
 
     elementoFrase.style.whiteSpace = 'nowrap';
+
     elementoFrase.style.display = 'inline-block';
 
     cambiarColorYPosicion(elementoFrase);
@@ -344,15 +374,18 @@ function crearFraseAleatoriaMovil(fraseCompleta) {
 
     elementoFrase.style.animationDelay = `${retraso}s`;
 
-    elementoFrase.addEventListener('animationiteration', () => {
-        cambiarColorYPosicion(elementoFrase);
-    });
+    elementoFrase.addEventListener(
+        'animationiteration',
+        () => {
+            cambiarColorYPosicion(elementoFrase);
+        }
+    );
 
     contenedorFondo.appendChild(elementoFrase);
 }
 
 // ===============================================
-// POSICIÓN Y COLOR
+// COLOR Y POSICIÓN
 // ===============================================
 
 function cambiarColorYPosicion(elemento) {
@@ -363,7 +396,10 @@ function cambiarColorYPosicion(elemento) {
 
     const claseColorAleatorio =
         clasesFosforo[
-            Math.floor(Math.random() * clasesFosforo.length)
+            Math.floor(
+                Math.random() *
+                clasesFosforo.length
+            )
         ];
 
     elemento.classList.add(claseColorAleatorio);
@@ -375,6 +411,7 @@ function cambiarColorYPosicion(elemento) {
         Math.floor(Math.random() * 80) + 5;
 
     elemento.style.left = `${posicionX}%`;
+
     elemento.style.top = `${posicionY}%`;
 }
 
@@ -404,7 +441,9 @@ function crearFraseEnPantallaPC(texto) {
     contenedorFondo.appendChild(elementoFrase);
 
     setTimeout(() => {
+
         elementoFrase.remove();
+
     }, 14000);
 }
 
@@ -426,7 +465,10 @@ function crearColoresLetrasPC(texto) {
 
         const colorAleatorio =
             colores[
-                Math.floor(Math.random() * colores.length)
+                Math.floor(
+                    Math.random() *
+                    colores.length
+                )
             ];
 
         return `
@@ -485,11 +527,13 @@ window.addEventListener('resize', () => {
         if (esMovil) {
 
             frase.style.whiteSpace = 'nowrap';
+
             frase.style.display = 'inline-block';
 
         } else {
 
             frase.style.whiteSpace = 'normal';
+
             frase.style.display = 'block';
         }
     });
