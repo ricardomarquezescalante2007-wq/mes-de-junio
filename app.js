@@ -51,12 +51,10 @@ function normalizarTexto(texto) {
 }
 
 function verificarMensaje(texto) {
-    const textoLimpio = normalizarTexto(texto);
-    for (const palabra of palabrasNegativas) {
+    const palabrasUsuario = texto.toLowerCase().split(' ');
+    for (const palabra of palabrasUsuario) {
         const palabraLimpia = normalizarTexto(palabra);
-        if (textoLimpio.includes(palabraLimpia)) return true;
-        const regex = new RegExp(palabraLimpia.split('').join('.*'), 'i');
-        if (regex.test(textoLimpio)) return true;
+        if (palabrasNegativas.includes(palabraLimpia)) return true;
     }
     return false;
 }
