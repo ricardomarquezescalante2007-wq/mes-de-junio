@@ -16,7 +16,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ===============================================
-// LISTA EXPANDIDA DE PALABRAS PROHIBIDAS
+// LISTA DE PALABRAS PROHIBIDAS
 // ===============================================
 
 const palabrasNegativas = [
@@ -82,8 +82,8 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    // Permite letras (a-z, A-Z), espacios, ñ y vocales con tilde
-    if (/[^a-zA-Z\s\u00F1\u00D1\u00E1\u00E9\u00ED\u00F3\u00FA\u00C1\u00C9\u00CD\u00D3\u00DA]/.test(texto)) {
+    // Permite letras, espacios, ñ y acentos. Bloquea números y símbolos.
+    if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(texto)) {
         mensajeError.innerText = "Los caracteres especiales y números no están permitidos, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
         return;
