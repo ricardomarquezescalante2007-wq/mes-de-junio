@@ -1,3 +1,12 @@
+.frase-animada {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    pointer-events: none;
+    z-index: 2; /* Asegura que esté por encima del fondo pero debajo del formulario */
+    font-size: 1.5rem;
+    color: white;
+}
 /* ==========================================
    ESTILOS GENERALES
    ========================================== */
