@@ -29,7 +29,7 @@ const palabrasNegativas = [
 ];
 
 // ===============================================
-// NORMALIZACIÓN
+// FUNCIONES DE NORMALIZACIÓN
 // ===============================================
 
 function normalizarTexto(texto) {
@@ -59,7 +59,7 @@ function verificarMensaje(mensajeUsuario) {
 }
 
 // ===============================================
-// ELEMENTOS DOM
+// ELEMENTOS DOM Y COLORES
 // ===============================================
 
 const formulario = document.getElementById('formulario-mensaje');
@@ -69,10 +69,10 @@ const contenedorFondo = document.getElementById('fondo-frases');
 const tarjetaPrincipal = document.querySelector('.contenedor-principal');
 const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
 
-const clasesFosforo = ['fosforo-verde', 'fosforo-rosa', 'fosforo-azul', 'fosforo-amarillo', 'fosforo-naranja'];
+const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
 
 // ===============================================
-// LÓGICA PRINCIPAL
+// LÓGICA DE FORMULARIO
 // ===============================================
 
 formulario.addEventListener('submit', (e) => {
@@ -85,9 +85,7 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    // Permitir letras, espacios, puntos y comas. Bloquear números y símbolos ofensivos.
     const caracteresInvalidos = /[0-9@#$%^&*()_\-+=\[\]{};:'"<>/?\\|`~]/;
-
     if (caracteresInvalidos.test(textoMensaje)) {
         mensajeError.innerText = "No se permiten números ni caracteres especiales";
         mensajeError.classList.remove('oculto');
@@ -103,7 +101,7 @@ formulario.addEventListener('submit', (e) => {
     mensajeError.classList.add('oculto');
     database.ref('frases').push({ texto: textoMensaje, timestamp: Date.now() });
     entrada.value = '';
-    tarjetaPrincipal.classList.remove('deslizar-mostrar');
+    
     tarjetaPrincipal.classList.add('deslizar-ocultar');
     setTimeout(() => btnAbrirFormulario.classList.remove('oculto'), 400);
 });
@@ -114,51 +112,32 @@ btnAbrirFormulario.addEventListener('click', () => {
     tarjetaPrincipal.classList.add('deslizar-mostrar');
 });
 
+// ===============================================
+// RENDERIZADO DE FRASES (UNIFICADO)
+// ===============================================
+
 database.ref('frases').on('child_added', (snapshot) => {
-    procesarDistribuciónFrase(snapshot.val().texto);
+    crearFrase(snapshot.val().texto);
 });
 
-function procesarDistribuciónFrase(texto) {
-    if (window.innerWidth <= 600) {
-        if (texto.trim() !== "") crearFraseAleatoriaMovil(texto);
-    } else {
-        crearFraseEnPantallaPC(texto);
-    }
-}
-
-function crearFraseAleatoriaMovil(fraseCompleta) {
-    const elementoFrase = document.createElement('div');
-    elementoFrase.classList.add('frase-animada');
-    elementoFrase.innerText = fraseCompleta;
-    elementoFrase.style.whiteSpace = 'nowrap';
-    elementoFrase.style.display = 'inline-block';
-    cambiarColorYPosicion(elementoFrase);
-    elementoFrase.style.animationDelay = `${Math.random() * 5}s`;
-    elementoFrase.addEventListener('animationiteration', () => cambiarColorYPosicion(elementoFrase));
-    contenedorFondo.appendChild(elementoFrase);
-}
-
-function cambiarColorYPosicion(elemento) {
-    clasesFosforo.forEach(clase => elemento.classList.remove(clase));
-    elemento.classList.add(clasesFosforo[Math.floor(Math.random() * clasesFosforo.length)]);
-    elemento.style.left = `${Math.floor(Math.random() * 45) + 5}%`;
+function crearFrase(texto) {
+    const elemento = document.createElement('div');
+    elemento.classList.add('frase-animada');
+    
+    // Posicionamiento absoluto forzado
+    elemento.style.position = 'absolute';
+    elemento.style.left = `${Math.floor(Math.random() * 70) + 5}%`;
     elemento.style.top = `${Math.floor(Math.random() * 80) + 5}%`;
-}
-
-function crearFraseEnPantallaPC(texto) {
-    const elementoFrase = document.createElement('div');
-    elementoFrase.classList.add('frase-animada');
-    elementoFrase.innerHTML = crearColoresLetrasPC(texto);
-    elementoFrase.style.left = `${Math.floor(Math.random() * 80) + 5}%`;
-    elementoFrase.style.animationDelay = `${Math.random() * 2}s`;
-    contenedorFondo.appendChild(elementoFrase);
-    setTimeout(() => elementoFrase.remove(), 14000);
-}
-
-function crearColoresLetrasPC(texto) {
-    const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
-    return texto.split('').map(letra => {
+    elemento.style.cursor = 'default';
+    
+    // Colores aleatorios por letra
+    elemento.innerHTML = texto.split('').map(letra => {
         const color = colores[Math.floor(Math.random() * colores.length)];
-        return `<span style="color:${color}; font-weight:bold;">${letra}</span>`;
+        return `<span style="color:${color}; font-weight:bold; font-size:1.2rem;">${letra}</span>`;
     }).join('');
+
+    contenedorFondo.appendChild(elemento);
+
+    // Auto-limpieza después de 15 segundos
+    setTimeout(() => elemento.remove(), 15000);
 }
