@@ -4,20 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Muro de Frases Positivas</title>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-    <div id="fondo-frases" class="fondo-frases"></div>
+    <div id="fondo-frases"></div>
 
     <main class="contenedor-principal">
         <h1>Deja un mensaje bonito</h1>
         
         <form id="formulario-mensaje">
-            <div class="input-con-emojis">
-                <input type="text" id="entrada-mensaje" placeholder="Escribe algo que alegre el día a alguien..." maxlength="100" required>
-            </div> 
+            <input type="text" id="entrada-mensaje" placeholder="Escribe algo que alegre el día..." maxlength="100" required>
             <button type="submit">Compartir</button>
         </form>
         
@@ -28,7 +24,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
     <script src="app.js"></script>
 </body>
 </html>
