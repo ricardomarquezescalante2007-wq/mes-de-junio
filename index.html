@@ -7,18 +7,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    
     <div id="fondo-frases"></div>
 
-    <main class="contenedor-principal">
-        <h1>Deja un mensaje bonito</h1>
-        
-        <form id="formulario-mensaje">
-            <input type="text" id="entrada-mensaje" placeholder="Escribe algo que alegre el día..." maxlength="100" required>
-            <button type="submit">Compartir</button>
-        </form>
-        
-        <p id="mensaje-error" class="error oculto">El mensaje debe ser positivo. Intenta con palabras más amables.</p>
-    </main>
+    <div class="contenedor-centrado">
+        <main class="tarjeta-mensaje">
+            <h1>Deja un mensaje bonito</h1>
+            
+            <form id="formulario-mensaje">
+                <input type="text" id="entrada-mensaje" placeholder="Escribe algo que alegre el día..." maxlength="100" required>
+                <button type="submit">Compartir</button>
+            </form>
+            
+            <p id="mensaje-error" class="error oculto">El mensaje debe ser positivo. Intenta con palabras más amables.</p>
+        </main>
+    </div>
 
     <button id="btn-abrir-formulario" class="btn-abrir oculto">Escribir Mensaje</button>
 
