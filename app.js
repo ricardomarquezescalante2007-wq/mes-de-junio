@@ -34,14 +34,14 @@ formulario.addEventListener('submit', (e) => {
 
     entrada.value = '';
     
-    // Lógica visual: esconder tarjeta, mostrar botón
-    contenedorCentrado.classList.add('oculto');
+    // Ocultar tarjeta y mostrar botón
+    contenedorCentrado.style.display = 'none';
     btnAbrir.classList.remove('oculto');
 });
 
 // Evento para volver a mostrar la tarjeta
 btnAbrir.addEventListener('click', () => {
-    contenedorCentrado.classList.remove('oculto');
+    contenedorCentrado.style.display = 'flex';
     btnAbrir.classList.add('oculto');
 });
 
