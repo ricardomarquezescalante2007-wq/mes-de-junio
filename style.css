@@ -7,8 +7,10 @@ body {
     font-family: 'Segoe UI', sans-serif;
     background-color: #1a1a2e;
     color: #ffffff;
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
     overflow: hidden;
+    position: relative;
 }
 
 #fondo-frases {
@@ -22,15 +24,14 @@ body {
 }
 
 /* ==========================================
-   TARJETA DE MENSAJE (NUEVA CLASE)
+   TARJETA DE MENSAJE (CENTRADO ABSOLUTO)
    ========================================== */
 .tarjeta-mensaje {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    /* Fondo oscuro sólido con opacidad */
     background: rgba(45, 45, 68, 0.95);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -77,6 +78,7 @@ input {
     font-size: 1rem;
     outline: none;
     background: rgba(255, 255, 255, 0.9);
+    color: #333;
 }
 
 button {
@@ -92,11 +94,10 @@ button {
 .error { color: #ff4a4a; font-size: 0.9rem; margin-top: 15px; }
 
 /* ==========================================
-   ANIMACIONES
+   ANIMACIONES (CENTRADO MANTENIDO)
    ========================================== */
 .tarjeta-mensaje.deslizar-ocultar {
     animation: deslizarDerecha 0.5s ease-in-out forwards;
-    pointer-events: none;
 }
 
 .tarjeta-mensaje.deslizar-mostrar {
