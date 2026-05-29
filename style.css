@@ -1,3 +1,14 @@
+#fondo-frases {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    /* Esto obliga al div a ocupar espacio aunque esté vacío */
+    display: block; 
+}
 .frase-animada {
     position: absolute;
     opacity: 0;
