@@ -11,9 +11,6 @@ body {
     overflow: hidden;
 }
 
-/* ==========================================
-   FONDO DE FRASES
-   ========================================== */
 #fondo-frases {
     position: fixed;
     top: 0;
@@ -25,16 +22,16 @@ body {
 }
 
 /* ==========================================
-   CONTENEDOR PRINCIPAL (TARJETA)
+   TARJETA DE MENSAJE (NUEVA CLASE)
    ========================================== */
-.contenedor-principal {
+.tarjeta-mensaje {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    /* Fondo más sólido y oscuro para que no se transparente el texto detrás */
-    background: rgba(45, 45, 68, 0.9);
+    /* Fondo oscuro sólido con opacidad */
+    background: rgba(45, 45, 68, 0.95);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     padding: 40px;
@@ -66,18 +63,12 @@ body {
     box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
 }
 
-.btn-abrir.oculto {
-    display: none !important;
-}
+.oculto { display: none !important; }
 
 /* ==========================================
-   FORMULARIO Y ELEMENTOS
+   FORMULARIO
    ========================================== */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+form { display: flex; flex-direction: column; gap: 15px; }
 
 input {
     padding: 15px;
@@ -95,25 +86,20 @@ button {
     border: none;
     border-radius: 8px;
     font-size: 1rem;
-    font-weight: bold;
     cursor: pointer;
 }
 
-.error {
-    color: #ff4a4a;
-    font-size: 0.9rem;
-    margin-top: 15px;
-}
+.error { color: #ff4a4a; font-size: 0.9rem; margin-top: 15px; }
 
 /* ==========================================
    ANIMACIONES
    ========================================== */
-.contenedor-principal.deslizar-ocultar {
+.tarjeta-mensaje.deslizar-ocultar {
     animation: deslizarDerecha 0.5s ease-in-out forwards;
     pointer-events: none;
 }
 
-.contenedor-principal.deslizar-mostrar {
+.tarjeta-mensaje.deslizar-mostrar {
     animation: deslizarIzquierda 0.5s ease-in-out forwards;
 }
 
@@ -125,8 +111,6 @@ button {
     from { transform: translate(-150%, -50%) scale(0.9); opacity: 0; }
     to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
-
-.oculto { display: none !important; }
 
 /* ==========================================
    FRASES ANIMADAS
@@ -144,15 +128,7 @@ button {
 
 .frase-animada span {
     background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
-    background-size: 400% 400%;
-    animation: cambiarColores 10s ease infinite;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-}
-
-@keyframes cambiarColores {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
