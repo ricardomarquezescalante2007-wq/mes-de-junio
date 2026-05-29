@@ -15,6 +15,21 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ===============================================
+// ELEMENTOS Y ESTADOS
+// ===============================================
+const formulario = document.getElementById('formulario-mensaje');
+const entrada = document.getElementById('entrada-mensaje');
+const mensajeError = document.getElementById('mensaje-error');
+const contenedorFondo = document.getElementById('fondo-frases');
+const tarjetaPrincipal = document.querySelector('.contenedor-principal');
+const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
+
+// Asegurar estado inicial al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    btnAbrirFormulario.classList.add('oculto');
+});
+
+// ===============================================
 // LÓGICA DE VALIDACIÓN
 // ===============================================
 const palabrasNegativas = ["pendejo", "pendeja", "cabron", "puta", "puto", "chingar", "mierda", "verga", "idiota", "estupido"];
@@ -30,15 +45,8 @@ function verificarYNormalizar(texto) {
 }
 
 // ===============================================
-// MANEJO DEL DOM Y FORMULARIO
+// EVENTOS DEL FORMULARIO
 // ===============================================
-const formulario = document.getElementById('formulario-mensaje');
-const entrada = document.getElementById('entrada-mensaje');
-const mensajeError = document.getElementById('mensaje-error');
-const contenedorFondo = document.getElementById('fondo-frases');
-const tarjetaPrincipal = document.querySelector('.contenedor-principal');
-const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
-
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
     const texto = entrada.value.trim();
@@ -58,12 +66,20 @@ formulario.addEventListener('submit', (e) => {
     database.ref('frases').push({ texto: texto, timestamp: Date.now() });
     entrada.value = '';
     mensajeError.classList.add('oculto');
+    
+    // Animación de salida y muestra del botón
+    tarjetaPrincipal.classList.remove('deslizar-mostrar');
     tarjetaPrincipal.classList.add('deslizar-ocultar');
-    setTimeout(() => btnAbrirFormulario.classList.remove('oculto'), 400);
+    
+    setTimeout(() => {
+        tarjetaPrincipal.style.display = 'none';
+        btnAbrirFormulario.classList.remove('oculto');
+    }, 500);
 });
 
 btnAbrirFormulario.addEventListener('click', () => {
     btnAbrirFormulario.classList.add('oculto');
+    tarjetaPrincipal.style.display = 'block';
     tarjetaPrincipal.classList.remove('deslizar-ocultar');
     tarjetaPrincipal.classList.add('deslizar-mostrar');
 });
@@ -90,7 +106,6 @@ function crearFrase(texto) {
 
 database.ref('frases').on('child_added', (snap) => crearFrase(snap.val().texto));
 
-// Bucle para frases históricas
 database.ref('frases').once('value', (snap) => {
     const frases = Object.values(snap.val() || {}).map(o => o.texto);
     if (frases.length > 0) {
