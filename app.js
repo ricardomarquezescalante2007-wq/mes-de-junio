@@ -41,15 +41,11 @@ const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
 // ===============================================
 
 function normalizarTexto(texto) {
-    const reemplazos = {
-        '0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g'
-    };
-    // Reemplazamos números por letras antes de limpiar
+    const reemplazos = { '0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g' };
     let textoProcesado = texto.toLowerCase();
     for (const char in reemplazos) {
         textoProcesado = textoProcesado.split(char).join(reemplazos[char]);
     }
-    // Quitamos acentos para la comparación, pero mantenemos las letras
     return textoProcesado.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
@@ -82,7 +78,6 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    // Bloquea números y símbolos, permitiendo letras, espacios, acentos y ñ
     if (/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(texto)) {
         mensajeError.innerText = "No se permiten números ni caracteres especiales, solo letras";
         mensajeError.classList.remove('oculto');
@@ -109,7 +104,7 @@ btnAbrirFormulario.addEventListener('click', () => {
 });
 
 // ===============================================
-// RENDERIZADO
+// RENDERIZADO MEJORADO PARA EVITAR AMONTONAMIENTO
 // ===============================================
 
 database.ref('frases').on('child_added', (snapshot) => {
@@ -118,17 +113,29 @@ database.ref('frases').on('child_added', (snapshot) => {
 
 function crearFrase(texto) {
     const elemento = document.createElement('div');
-    elemento.classList.add('frase-animada');
+    elemento.className = 'frase-animada';
+    
+    // Posicionamiento aleatorio disperso
     elemento.style.position = 'absolute';
-    elemento.style.left = `${Math.floor(Math.random() * 70) + 5}%`;
-    elemento.style.top = `${Math.floor(Math.random() * 80) + 5}%`;
+    elemento.style.left = `${Math.random() * 80}%`;
+    elemento.style.top = `${Math.random() * 80}%`;
     elemento.style.whiteSpace = 'nowrap';
+    elemento.style.transition = 'opacity 1s ease';
+    elemento.style.opacity = '0';
     
     elemento.innerHTML = texto.split('').map(letra => {
         const color = colores[Math.floor(Math.random() * colores.length)];
-        return `<span style="color:${color}; font-weight:bold; font-size:1.2rem;">${letra}</span>`;
+        return `<span style="color:${color}; font-weight:bold; font-size:1.2rem; margin: 0 2px;">${letra}</span>`;
     }).join('');
 
     contenedorFondo.appendChild(elemento);
-    setTimeout(() => elemento.remove(), 15000);
+    
+    // Fade in
+    requestAnimationFrame(() => { elemento.style.opacity = '1'; });
+    
+    // Desaparece después de 12 segundos
+    setTimeout(() => {
+        elemento.style.opacity = '0';
+        setTimeout(() => elemento.remove(), 1000);
+    }, 12000);
 }
