@@ -8,11 +8,11 @@ body {
     background-color: #1a1a2e;
     color: #ffffff;
     min-height: 100vh;
-    overflow: hidden; /* Evita scroll innecesario */
+    overflow: hidden;
 }
 
 /* ==========================================
-   FONDO DE FRASES
+   FONDO DE FRASES (Lienzo para frases flotantes)
    ========================================== */
 #fondo-frases {
     position: fixed;
@@ -21,7 +21,7 @@ body {
     width: 100vw;
     height: 100vh;
     z-index: 1;
-    pointer-events: none; /* Crucial para que no bloquee el formulario */
+    pointer-events: none;
 }
 
 /* ==========================================
@@ -31,7 +31,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centrado matemático preciso */
+    transform: translate(-50%, -50%);
     z-index: 10;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -60,6 +60,10 @@ body {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+}
+
+.btn-abrir.oculto {
+    display: none !important;
 }
 
 /* ==========================================
@@ -92,9 +96,9 @@ body {
 }
 
 /* ==========================================
-   CLASES DE UTILIDAD
+   CLASES DE UTILIDAD Y ANIMACIONES
    ========================================== */
-.oculto { display: none; }
+.oculto { display: none !important; }
 
 .contenedor-principal.deslizar-ocultar {
     animation: deslizarDerecha 0.5s ease-in-out forwards;
