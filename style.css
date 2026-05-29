@@ -1,67 +1,82 @@
 /* ==========================================
-   ESTILOS GENERALES Y CUERPO DE LA PÁGINA
+   ESTILOS GENERALES
    ========================================== */
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: #1a1a2e;
     color: #ffffff;
-    /* Flexbox centra el contenedor del formulario perfectamente en pantalla */
     display: flex;
     justify-content: center;
     align-items: center;
-    /* min-height asegura que ocupe toda la pantalla pero permita scroll si el contenido se desborda en móviles */
     min-height: 100vh;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* ==========================================
-   CONTENEDOR DE FRASES (FONDO DE PÁGINA)
+   CONTENEDOR DE FRASES (FONDO)
    ========================================== */
-/* Este contenedor ocupa todo el fondo de la pantalla de forma invisible.
-   Sirve como lienzo para que las frases se muevan de forma aleatoria sin interferir 
-   con la interfaz del formulario ni generar barras de scroll horizontales o verticales. */
-.fondo-frases {
-    position: absolute;
+#fondo-frases {
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Se mantiene al fondo, por detrás del formulario */
-    pointer-events: none; /* Crucial: permite que el usuario haga clic en los inputs a través de las frases */
-    overflow: hidden; /* Corta las frases que se salen de la pantalla durante la animación */
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ==========================================
+   FRASES ANIMADAS (INDIVIDUALES)
+   ========================================== */
+.frase-animada {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: opacity 1.5s ease-in-out;
+    opacity: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.frase-animada span {
+    background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
+    background-size: 400% 400%;
+    animation: cambiarColores 10s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@keyframes cambiarColores {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* ==========================================
    CONTENEDOR PRINCIPAL (FORMULARIO)
    ========================================== */
-/* Es la tarjeta central flotante que aloja el título, los inputs y el botón.
-   Usa un efecto de cristal esmerilado (Glassmorphism) para integrarse estéticamente con el fondo. */
 .contenedor-principal {
     position: relative;
-    z-index: 10; /* Se posiciona por encima del fondo animado para que sea interactivo */
-    background: rgba(255, 255, 255, 0.1); /* Fondo blanco con alta transparencia */
-    backdrop-filter: blur(10px); /* Desenfoque del fondo en navegadores modernos */
-    -webkit-backdrop-filter: blur(10px); /* Compatibilidad del desenfoque para Safari en iOS */
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra suave para dar efecto de profundidad */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
     text-align: center;
     max-width: 400px;
-    width: 90%; /* Se adapta al ancho de pantallas pequeñas */
-}
-
-/* Elementos internos del contenedor principal */
-h1 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
+    width: 90%;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Separación vertical uniforme entre inputs y botones */
+    gap: 10px;
 }
 
 input {
@@ -80,11 +95,7 @@ button {
     border-radius: 8px;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.3s; /* Suaviza el cambio de color al pasar el cursor */
-}
-
-button:hover {
-    background-color: #ff5270;
+    transition: background 0.3s;
 }
 
 .error {
@@ -94,306 +105,30 @@ button:hover {
 }
 
 .oculto {
-    display: none; /* Clase de utilidad para esconder elementos desde JavaScript */
+    display: none;
 }
 
 /* ==========================================
-   CONTENEDOR DE FRASES ANIMADAS (INDIVIDUALES)
+   ANIMACIONES DE TRANSICIÓN
    ========================================== */
-/* Estilo base para cada texto individual que va a flotar desde el fondo hacia arriba. */
-.frase-animada {
-    position: absolute;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.6);
-    white-space: nowrap; /* Evita que el texto se rompa en varias líneas durante la animación */
-    animation: flotar 12s linear forwards;
-}
-
-/* Animación que aparezcan y desaparezcan las frases en cualquier lugar  y solo aparezca y desaparezca en el mismo lugar */
-@keyframes flotar {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    90% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
-
-
- 
-/* ==========================================
-   CONTENEDOR DE NOTIFICACIONES / MENSAJES Emergentes
-   ========================================== */
-/* Este contenedor se ubica de forma fija en la parte inferior central de la pantalla.
-   Sirve para apilar las alertas, notificaciones o mensajes que aparecen temporalmente. */
-.contenedor-mensajes {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%); /* Centrado horizontal perfecto */
-    z-index: 10; /* Al mismo nivel que el formulario para que sea visible */
-    max-width: 90%;
-    width: 400px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Espaciado entre notificaciones consecutivas */
-    pointer-events: none; /* Evita que bloquee clics si hay mensajes transparentes o terminando su animación */
-}
-
-/* Tarjeta individual de mensaje dentro del contenedor de notificaciones */
-.mensaje {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    font-size: 1rem;
-    color: #ffffff;
-}
-
-/* Modificador para que el texto de las frases animadas tenga un degradado dinámico de colores vivos. */
-.frase-animada span {
-    background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
-    background-size: 400% 400%;
-    animation: cambiarColores 10s ease infinite;
-    
-    /* Versiones con prefijo para compatibilidad (Chrome antiguo, Safari, iOS) */
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    
-    /* Versiones estándar oficiales (Eliminan las advertencias en la mayoría de los editores) */
-    background-clip: text;
-    color: transparent; 
-}
-
-/* Animación que cambia el fondo del texto para crear un efecto de degradado dinámico*/
-@keyframes cambiarColores {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Modificador para controlar la aparición y desaparición gradual de las notificaciones */
-.mensaje-animado {
-    animation: aparecerDesaparecer 3s ease forwards;
-}
-
-@keyframes aparecerDesaparecer {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    90% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
-
-/* ==========================================
-   ADAPTACIÓN PARA DISPOSITIVOS MÓVILES
-   ========================================== */
-@media (max-width: 600px) {
-    .contenedor-principal {
-        padding: 20px; /* Reduce los márgenes internos para aprovechar el espacio en pantallas pequeñas */
-    }
-
-    h1 {
-        font-size: 1.2rem;
-    }
-
-    input, button {
-        font-size: 0.9rem;
-        padding: 10px;
-    }
-}
-
-/*frases random*/
-.frase-animada span {
-    background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
-    background-size: 400% 400%;
-    animation: cambiarColores 10s ease infinite;
-    
-    /* Versiones con prefijo para compatibilidad (Chrome antiguo, Safari, iOS) */
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    
-    /* Versiones estándar oficiales (Eliminan las advertencias en la mayoría de los editores) */
-    background-clip: text;
-    color: transparent; 
-}
-
-/* animacion para las frases random */
-@keyframes cambiarColores {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/*degradado para las frases random */
-.frase-animada span {
-    background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
-    background-size: 400% 400%;
-    animation: cambiarColores 10s ease infinite;
-    
-    /* Versiones con prefijo para compatibilidad (Chrome antiguo, Safari, iOS) */
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    
-    /* Versiones estándar oficiales (Eliminan las advertencias en la mayoría de los editores) */
-    background-clip: text;
-    color: transparent; 
-}
-
-/*efecto luminoso para las frases random con colores llamativos*/
-.frase-animada span {
-    text-shadow: 0 0 5px rgba(255, 107, 107, 0.8), 
-                 0 0 10px rgba(240, 101, 149, 0.8), 
-                 0 0 15px rgba(233, 69, 96, 0.8), 
-                 0 0 20px rgba(255, 82, 112, 0.8);
-}
-
-/*animacion para la tarjeta de mensaje emergente*/
-.mensaje-animado {
-    animation: aparecerDesaparecer 3s ease forwards;
-}
-
-/*transparecnia para la tarjeta de mensaje emergente*/
-.mensaje {
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    font-size: 1rem;
-    color: #ffffff;
-}   
-
-/*animacion para la tarjeta de mensaje emergente*/
-@keyframes aparecerDesaparecer {
-    0% {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    90% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-}
-
-/*animacion para los mensajes emergentes de aparecer y desaparecer en lugares random de la pantalla*/
-.mensaje-animado {
-    animation: aparecerDesaparecer 3s ease forwards;
-}
-
-/*estilo para pc*/
-.contenedor-principal {
-    position: relative;
-    z-index: 10; /* Se posiciona por encima del fondo animado para que sea interactivo */
-    background: rgba(255, 255, 255, 0.1); /* Fondo blanco con alta transparencia */
-    backdrop-filter: blur(10px); /* Desenfoque del fondo en navegadores modernos */
-    -webkit-backdrop-filter: blur(10px); /* Compatibilidad del desenfoque para Safari en iOS */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Sombra suave para dar efecto de profundidad */
-    text-align: center;
-    max-width: 400px;
-    width: 90%; /* Se adapta al ancho de pantallas pequeñas */
-}
-
-/*degradado para las frases random*/
-.frase-animada span {
-    background: linear-gradient(45deg, #ff6b6b, #f06595, #e94560, #ff5270);
-    background-size: 400% 400%;
-    animation: cambiarColores 10s ease infinite;
-    
-    /* Versiones con prefijo para compatibilidad (Chrome antiguo, Safari, iOS) */
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-    
-    /* Versiones estándar oficiales (Eliminan las advertencias en la mayoría de los editores) */
-    background-clip: text;  
-        color: transparent;
-}
-
-/* Cambia esto en tu CSS de móviles para que no se detenga */
-.frase-animada {
-    position: absolute;
-    font-size: 1.5rem;
-    font-weight: bold;
-    white-space: nowrap;
-    animation: aparecerFosforo 6s ease-in-out infinite; /* Se cambió 'forwards' por 'infinite' y subió a 6s para mayor suavidad */
+.contenedor-principal.deslizar-ocultar {
+    animation: deslizarDerecha 0.5s ease-in-out forwards;
     pointer-events: none;
 }
 
-/* ==========================================
-   ANIMACIONES DE OCULTAR / MOSTRAR TARJETA
-   ========================================== */
-
-/* Clase que se aplicará para ocultar la tarjeta deslizándose a la derecha */
-.contenedor-principal.deslizar-ocultar {
-    animation: deslizarDerecha 0.5s ease-in-out forwards;
-    pointer-events: none; /* Evita que bloquee clics estando invisible */
-}
-
-@keyframes deslizarDerecha {
-    0% {
-        transform: translateX(0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translateX(120%) scale(0.9);
-        opacity: 0;
-        display: none; /* Lo saca del flujo visual */
-    }
-}
-
-/* Clase para cuando la tarjeta vuelva a aparecer */
 .contenedor-principal.deslizar-mostrar {
-    display: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     animation: deslizarIzquierda 0.5s ease-in-out forwards;
 }
 
-@keyframes deslizarIzquierda {
-    0% {
-        transform: translateX(-120%) scale(0.9);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0) scale(1);
-        opacity: 1;
-    }
+@keyframes deslizarDerecha {
+    to { transform: translateX(120%) scale(0.9); opacity: 0; }
 }
 
-/* Botón flotante inferior para reabrir el formulario */
+@keyframes deslizarIzquierda {
+    from { transform: translateX(-120%) scale(0.9); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
+}
+
 .btn-abrir {
     position: fixed;
     bottom: 20px;
@@ -402,44 +137,8 @@ button:hover {
     background-color: #e94560;
     color: white;
     border: none;
-    border-radius: 25px; /* Bordes redondeados tipo píldora */
-    font-size: 1rem;
+    border-radius: 25px;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
-    transition: transform 0.3s, background-color 0.3s;
-}
-
-.btn-abrir:hover {
-    background-color: #ff5270;
-    transform: scale(1.05);
-}
-
-@media (max-width: 600px) {
-    .frase-animada {
-        position: absolute;
-        font-size: 1.4rem;
-        font-weight: bold;
-        white-space: nowrap;
-        /* Llama a la animación de desvanecimiento, dura 6 segundos y se repite eternamente */
-        animation: desvanecerFosforo 6s ease-in-out infinite;
-        pointer-events: none;
-        opacity: 0; /* Inicia invisible para esperar el tiempo de delay del JS */
-    }
-
-    /* Animación pura de opacidad para que aparezcan y desaparezcan en el mismo sitio */
-    @keyframes desvanecerFosforo {
-        0% {
-            opacity: 0;
-        }
-        20% {
-            opacity: 1;
-        }
-        80% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-        }
-    }
 }
