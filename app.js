@@ -16,22 +16,28 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ===============================================
-// LISTAS Y REGLAS
+// LISTA EXPANDIDA DE PALABRAS PROHIBIDAS
 // ===============================================
 
 const palabrasNegativas = [
-    "pendejo", "pendeja", "cabron", "cabrona", "culero", "culera", "puta", "puto", 
-    "chingar", "chingada", "chingado", "mierda", "verga", "mamon", "idiota", "imbecil", 
-    "tarado", "baboso", "estupido", "pinche", "ojete", "naco", "perra", "zorra", 
-    "maricon", "joto", "puñetas", "chaqueto", "puta madre", "hijo de puta", 
-    "hijo de la chingada", "chinga tu madre", "vete a la verga", "no mames", 
-    "fuck", "fucker", "motherfucker", "bitch", "asshole", "dumbass", "bastard"
+    "pendejo", "pendeja", "pendejadas", "cabron", "cabrona", "culero", "culera", "puta", "puto", 
+    "chingar", "chingada", "chingado", "chingon", "chingona", "mierda", "mierdero", "verga", 
+    "verguero", "mamon", "mamona", "idiota", "imbecil", "tarado", "baboso", "estupido", 
+    "estupida", "pinche", "ojete", "naco", "naca", "perra", "zorra", "maricon", "joto", 
+    "puñetas", "chaqueto", "pito", "pija", "polla", "coño", "cagar", "cagado", "culiado", 
+    "culeado", "vagina", "penis", "wey", "guey", "follar", "follando", "panocha", "joder", 
+    "jodido", "jodida", "chingadamadre", "mierdoso", "idiotez", "bastardo", "malparido", 
+    "malparida", "careverga", "hijueputa", "putamadre", "putero", "putera", "ano", "nalgas", 
+    "tetas", "chichis", "vergazo", "culon", "culona", "panochon", "pelado", "pelada", 
+    "fuck", "fucker", "motherfucker", "bitch", "asshole", "dumbass", "bastard", "cunt", 
+    "shit", "dick", "cock", "pussy", "wanker", "faggot", "nigger", "dickhead", "twat", 
+    "piss", "slut", "whore", "cum", "semen", "garchado", "garchada", "boludo", "pelotudo"
 ];
 
 const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
 
 // ===============================================
-// VALIDACIÓN Y NORMALIZACIÓN
+// LÓGICA DE VALIDACIÓN Y NORMALIZACIÓN
 // ===============================================
 
 function normalizarTexto(texto) {
@@ -56,7 +62,7 @@ function verificarMensaje(texto) {
 }
 
 // ===============================================
-// ELEMENTOS DOM
+// LÓGICA DE FORMULARIO
 // ===============================================
 
 const formulario = document.getElementById('formulario-mensaje');
@@ -65,10 +71,6 @@ const mensajeError = document.getElementById('mensaje-error');
 const contenedorFondo = document.getElementById('fondo-frases');
 const tarjetaPrincipal = document.querySelector('.contenedor-principal');
 const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
-
-// ===============================================
-// LÓGICA DE ENVÍO
-// ===============================================
 
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -80,14 +82,12 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    // Bloqueo estricto de números y caracteres especiales
     if (/[^a-zA-Z\s]/.test(texto)) {
         mensajeError.innerText = "Los caracteres especiales y números no están permitidos, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
         return;
     }
 
-    // Bloqueo de groserías
     if (verificarMensaje(texto)) {
         mensajeError.innerText = "Esta palabra no está permitida, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
@@ -108,7 +108,7 @@ btnAbrirFormulario.addEventListener('click', () => {
 });
 
 // ===============================================
-// RENDERIZADO UNIFICADO
+// RENDERIZADO
 // ===============================================
 
 database.ref('frases').on('child_added', (snapshot) => {
