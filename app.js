@@ -1,6 +1,4 @@
-// ===============================================
-// CONFIGURACIÓN FIREBASE
-// ===============================================
+// Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCWOSCmwXJkCucciMvrCi4kKcdSbUJ2bno",
     authDomain: "muro-mensajes-positivos.firebaseapp.com",
@@ -14,88 +12,52 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// ===============================================
-// ELEMENTOS DEL DOM
-// ===============================================
+// Elementos del DOM
 const formulario = document.getElementById('formulario-mensaje');
 const entrada = document.getElementById('entrada-mensaje');
-const mensajeError = document.getElementById('mensaje-error');
-const contenedorFondo = document.getElementById('fondo-frases');
-const tarjetaPrincipal = document.querySelector('.contenedor-principal');
-const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
+const contenedorCentrado = document.querySelector('.contenedor-centrado');
+const btnAbrir = document.getElementById('btn-abrir-formulario');
+const fondoFrases = document.getElementById('fondo-frases');
 
-// Asegurar estado inicial: tarjeta visible, botón oculto
-document.addEventListener('DOMContentLoaded', () => {
-    tarjetaPrincipal.style.display = 'block';
-    btnAbrirFormulario.classList.add('oculto');
-});
-
-// ===============================================
-// LÓGICA DE VALIDACIÓN
-// ===============================================
-const palabrasNegativas = ["pendejo", "pendeja", "cabron", "puta", "puto", "chingar", "mierda", "verga", "idiota", "estupido"];
-
-function verificarYNormalizar(texto) {
-    const reemplazos = {'0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g'};
-    let limpio = texto.toLowerCase();
-    for (const char in reemplazos) limpio = limpio.split(char).join(reemplazos[char]);
-    limpio = limpio.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
-    const palabras = limpio.split(/\s+/);
-    return palabras.some(p => palabrasNegativas.includes(p));
-}
-
-// ===============================================
-// EVENTOS DEL FORMULARIO
-// ===============================================
+// Evento de envío del formulario
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
     const texto = entrada.value.trim();
-
+    
     if (!texto) return;
-    if (/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(texto)) {
-        mensajeError.innerText = "Solo se permiten letras";
-        mensajeError.classList.remove('oculto');
-        return;
-    }
-    if (verificarYNormalizar(texto)) {
-        mensajeError.innerText = "Frase no permitida";
-        mensajeError.classList.remove('oculto');
-        return;
-    }
 
-    database.ref('frases').push({ texto: texto, timestamp: Date.now() });
+    // Guardar en Firebase
+    database.ref('frases').push({ 
+        texto: texto, 
+        timestamp: Date.now() 
+    });
+
     entrada.value = '';
-    mensajeError.classList.add('oculto');
     
-    // Ocultar tarjeta y mostrar botón
-    tarjetaPrincipal.classList.remove('deslizar-mostrar');
-    tarjetaPrincipal.classList.add('deslizar-ocultar');
-    
-    setTimeout(() => {
-        tarjetaPrincipal.style.display = 'none';
-        btnAbrirFormulario.classList.remove('oculto');
-    }, 500);
+    // Lógica visual: esconder tarjeta, mostrar botón
+    contenedorCentrado.classList.add('oculto');
+    btnAbrir.classList.remove('oculto');
 });
 
-btnAbrirFormulario.addEventListener('click', () => {
-    btnAbrirFormulario.classList.add('oculto');
-    tarjetaPrincipal.style.display = 'block';
-    tarjetaPrincipal.classList.remove('deslizar-ocultar');
-    tarjetaPrincipal.classList.add('deslizar-mostrar');
+// Evento para volver a mostrar la tarjeta
+btnAbrir.addEventListener('click', () => {
+    contenedorCentrado.classList.remove('oculto');
+    btnAbrir.classList.add('oculto');
 });
 
-// ===============================================
-// RENDERIZADO DE FRASES
-// ===============================================
+// Función para crear y animar frases en el fondo
 function crearFrase(texto) {
     const el = document.createElement('div');
     el.className = 'frase-animada';
-    el.style.left = `${Math.random() * 80}%`;
-    el.style.top = `${Math.random() * 80}%`;
-    el.innerHTML = `<span>${texto}</span>`;
-    contenedorFondo.appendChild(el);
     
+    // Posición aleatoria dentro de la pantalla
+    el.style.left = `${10 + Math.random() * 70}%`;
+    el.style.top = `${10 + Math.random() * 70}%`;
+    
+    el.innerHTML = `<span>${texto}</span>`;
+    fondoFrases.appendChild(el);
+    
+    // Animación de entrada y salida
     setTimeout(() => {
         el.style.opacity = '1';
         setTimeout(() => {
@@ -105,14 +67,7 @@ function crearFrase(texto) {
     }, 100);
 }
 
-database.ref('frases').on('child_added', (snap) => crearFrase(snap.val().texto));
-
-database.ref('frases').once('value', (snap) => {
-    const data = snap.val();
-    if (data) {
-        const frases = Object.values(data).map(o => o.texto);
-        if (frases.length > 0) {
-            setInterval(() => crearFrase(frases[Math.floor(Math.random() * frases.length)]), 8000);
-        }
-    }
+// Escuchar nuevas frases en tiempo real
+database.ref('frases').on('child_added', (snap) => {
+    crearFrase(snap.val().texto);
 });
