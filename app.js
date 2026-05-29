@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ===============================================
-// ELEMENTOS Y ESTADOS
+// ELEMENTOS DEL DOM
 // ===============================================
 const formulario = document.getElementById('formulario-mensaje');
 const entrada = document.getElementById('entrada-mensaje');
@@ -24,8 +24,9 @@ const contenedorFondo = document.getElementById('fondo-frases');
 const tarjetaPrincipal = document.querySelector('.contenedor-principal');
 const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
 
-// Asegurar estado inicial al cargar
+// Asegurar estado inicial: tarjeta visible, botón oculto
 document.addEventListener('DOMContentLoaded', () => {
+    tarjetaPrincipal.style.display = 'block';
     btnAbrirFormulario.classList.add('oculto');
 });
 
@@ -67,7 +68,7 @@ formulario.addEventListener('submit', (e) => {
     entrada.value = '';
     mensajeError.classList.add('oculto');
     
-    // Animación de salida y muestra del botón
+    // Ocultar tarjeta y mostrar botón
     tarjetaPrincipal.classList.remove('deslizar-mostrar');
     tarjetaPrincipal.classList.add('deslizar-ocultar');
     
@@ -107,8 +108,11 @@ function crearFrase(texto) {
 database.ref('frases').on('child_added', (snap) => crearFrase(snap.val().texto));
 
 database.ref('frases').once('value', (snap) => {
-    const frases = Object.values(snap.val() || {}).map(o => o.texto);
-    if (frases.length > 0) {
-        setInterval(() => crearFrase(frases[Math.floor(Math.random() * frases.length)]), 8000);
+    const data = snap.val();
+    if (data) {
+        const frases = Object.values(data).map(o => o.texto);
+        if (frases.length > 0) {
+            setInterval(() => crearFrase(frases[Math.floor(Math.random() * frases.length)]), 8000);
+        }
     }
 });
