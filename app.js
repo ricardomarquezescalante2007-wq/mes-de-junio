@@ -16,7 +16,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 // ===============================================
-// PALABRAS PROHIBIDAS
+// LISTAS Y REGLAS
 // ===============================================
 
 const palabrasNegativas = [
@@ -28,27 +28,24 @@ const palabrasNegativas = [
     "fuck", "fucker", "motherfucker", "bitch", "asshole", "dumbass", "bastard"
 ];
 
+const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
+
 // ===============================================
-// FUNCIONES DE NORMALIZACIÓN
+// VALIDACIÓN Y NORMALIZACIÓN
 // ===============================================
 
 function normalizarTexto(texto) {
     const reemplazos = {
-        '0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g',
-        '@':'a', '$':'s', '!':'i', '|':'i', '+':'t', '#':'h', '%':'x', '&':'y'
+        '0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g'
     };
-
-    texto = texto.toLowerCase()
+    return texto.toLowerCase()
         .split('').map(c => reemplazos[c] ?? c).join('')
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z]/g, '')
-        .replace(/(.)\1+/g, '$1');
-
-    return texto;
+        .replace(/[^a-z]/g, '');
 }
 
-function verificarMensaje(mensajeUsuario) {
-    const textoLimpio = normalizarTexto(mensajeUsuario);
+function verificarMensaje(texto) {
+    const textoLimpio = normalizarTexto(texto);
     for (const palabra of palabrasNegativas) {
         const palabraLimpia = normalizarTexto(palabra);
         if (textoLimpio.includes(palabraLimpia)) return true;
@@ -59,7 +56,7 @@ function verificarMensaje(mensajeUsuario) {
 }
 
 // ===============================================
-// ELEMENTOS DOM Y COLORES
+// ELEMENTOS DOM
 // ===============================================
 
 const formulario = document.getElementById('formulario-mensaje');
@@ -69,39 +66,37 @@ const contenedorFondo = document.getElementById('fondo-frases');
 const tarjetaPrincipal = document.querySelector('.contenedor-principal');
 const btnAbrirFormulario = document.getElementById('btn-abrir-formulario');
 
-const colores = ['#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1', '#5f27cd'];
-
 // ===============================================
-// LÓGICA DE FORMULARIO
+// LÓGICA DE ENVÍO
 // ===============================================
 
 formulario.addEventListener('submit', (e) => {
     e.preventDefault();
-    const textoMensaje = entrada.value.trim();
+    const texto = entrada.value.trim();
 
-    if (textoMensaje === "") {
+    if (texto === "") {
         mensajeError.innerText = "Escribe un mensaje";
         mensajeError.classList.remove('oculto');
         return;
     }
 
-    const caracteresInvalidos = /[0-9@#$%^&*()_\-+=\[\]{};:'"<>/?\\|`~]/;
-    if (caracteresInvalidos.test(textoMensaje)) {
-        mensajeError.innerText = "No se permiten números ni caracteres especiales";
+    // Bloqueo estricto de números y caracteres especiales
+    if (/[^a-zA-Z\s]/.test(texto)) {
+        mensajeError.innerText = "Los caracteres especiales y números no están permitidos, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
         return;
     }
 
-    if (verificarMensaje(textoMensaje)) {
-        mensajeError.innerText = "No se permiten palabras ofensivas";
+    // Bloqueo de groserías
+    if (verificarMensaje(texto)) {
+        mensajeError.innerText = "Esta palabra no está permitida, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
         return;
     }
 
     mensajeError.classList.add('oculto');
-    database.ref('frases').push({ texto: textoMensaje, timestamp: Date.now() });
+    database.ref('frases').push({ texto: texto, timestamp: Date.now() });
     entrada.value = '';
-    
     tarjetaPrincipal.classList.add('deslizar-ocultar');
     setTimeout(() => btnAbrirFormulario.classList.remove('oculto'), 400);
 });
@@ -113,7 +108,7 @@ btnAbrirFormulario.addEventListener('click', () => {
 });
 
 // ===============================================
-// RENDERIZADO DE FRASES (UNIFICADO)
+// RENDERIZADO UNIFICADO
 // ===============================================
 
 database.ref('frases').on('child_added', (snapshot) => {
@@ -123,21 +118,16 @@ database.ref('frases').on('child_added', (snapshot) => {
 function crearFrase(texto) {
     const elemento = document.createElement('div');
     elemento.classList.add('frase-animada');
-    
-    // Posicionamiento absoluto forzado
     elemento.style.position = 'absolute';
     elemento.style.left = `${Math.floor(Math.random() * 70) + 5}%`;
     elemento.style.top = `${Math.floor(Math.random() * 80) + 5}%`;
-    elemento.style.cursor = 'default';
+    elemento.style.whiteSpace = 'nowrap';
     
-    // Colores aleatorios por letra
     elemento.innerHTML = texto.split('').map(letra => {
         const color = colores[Math.floor(Math.random() * colores.length)];
         return `<span style="color:${color}; font-weight:bold; font-size:1.2rem;">${letra}</span>`;
     }).join('');
 
     contenedorFondo.appendChild(elemento);
-
-    // Auto-limpieza después de 15 segundos
     setTimeout(() => elemento.remove(), 15000);
 }
