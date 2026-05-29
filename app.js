@@ -44,17 +44,19 @@ function normalizarTexto(texto) {
     const reemplazos = {
         '0':'o', '1':'i', '2':'z', '3':'e', '4':'a', '5':'s', '6':'g', '7':'t', '8':'b', '9':'g'
     };
-    return texto.toLowerCase()
-        .split('').map(c => reemplazos[c] ?? c).join('')
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z]/g, '');
+    // Reemplazamos números por letras antes de limpiar
+    let textoProcesado = texto.toLowerCase();
+    for (const char in reemplazos) {
+        textoProcesado = textoProcesado.split(char).join(reemplazos[char]);
+    }
+    // Quitamos acentos para la comparación, pero mantenemos las letras
+    return textoProcesado.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function verificarMensaje(texto) {
-    const palabrasUsuario = texto.toLowerCase().split(' ');
+    const palabrasUsuario = normalizarTexto(texto).split(/\s+/);
     for (const palabra of palabrasUsuario) {
-        const palabraLimpia = normalizarTexto(palabra);
-        if (palabrasNegativas.includes(palabraLimpia)) return true;
+        if (palabrasNegativas.includes(palabra)) return true;
     }
     return false;
 }
@@ -80,9 +82,9 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    // Permite letras, espacios, ñ y acentos. Bloquea números y símbolos.
-    if (/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/.test(texto)) {
-        mensajeError.innerText = "Los caracteres especiales y números no están permitidos, solo se permiten frases motivadoras";
+    // Bloquea números y símbolos, permitiendo letras, espacios, acentos y ñ
+    if (/[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(texto)) {
+        mensajeError.innerText = "No se permiten números ni caracteres especiales, solo letras";
         mensajeError.classList.remove('oculto');
         return;
     }
