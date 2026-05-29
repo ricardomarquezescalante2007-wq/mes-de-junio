@@ -82,7 +82,8 @@ formulario.addEventListener('submit', (e) => {
         return;
     }
 
-    if (/[^a-zA-Z\s]/.test(texto)) {
+    // Permite letras, espacios, acentos y ñ. Bloquea números y símbolos.
+    if (/[^a-zA-Z\u00C0-\u00FF\s]/.test(texto)) {
         mensajeError.innerText = "Los caracteres especiales y números no están permitidos, solo se permiten frases motivadoras";
         mensajeError.classList.remove('oculto');
         return;
