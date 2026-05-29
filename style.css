@@ -24,7 +24,7 @@ body {
 }
 
 /* ==========================================
-   CONTENEDOR DE CENTRADO (NUEVO)
+   CONTENEDOR DE CENTRADO
    ========================================== */
 .contenedor-centrado {
     position: absolute;
@@ -38,9 +38,6 @@ body {
     z-index: 10;
 }
 
-/* ==========================================
-   TARJETA DE MENSAJE
-   ========================================== */
 .tarjeta-mensaje {
     background: rgba(45, 45, 68, 0.95);
     backdrop-filter: blur(15px);
@@ -56,7 +53,7 @@ body {
 }
 
 /* ==========================================
-   BOTÓN PARA ESCRIBIR MENSAJE
+   BOTÓN PARA AGREGAR FRASE
    ========================================== */
 .btn-abrir {
     position: fixed;
@@ -79,58 +76,49 @@ body {
 /* ==========================================
    FORMULARIO
    ========================================== */
-form { display: flex; flex-direction: column; gap: 15px; }
+form { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
 
-input {
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
+input { 
+    padding: 15px; 
+    border-radius: 8px; 
+    border: none; 
+    background: rgba(255, 255, 255, 0.9); 
+    color: #333; 
     font-size: 1rem;
-    outline: none;
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
 }
 
-button {
-    padding: 15px;
-    background-color: #e94560;
-    color: white;
-    border: none;
-    border-radius: 8px;
+button { 
+    padding: 15px; 
+    background-color: #e94560; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
     font-size: 1rem;
-    cursor: pointer;
 }
 
-.error { color: #ff4a4a; font-size: 0.9rem; margin-top: 15px; }
-
-/* ==========================================
-   ANIMACIONES
-   ========================================== */
-.tarjeta-mensaje.deslizar-ocultar {
-    animation: deslizarDerecha 0.5s ease-in-out forwards;
-}
-
-.tarjeta-mensaje.deslizar-mostrar {
-    animation: deslizarIzquierda 0.5s ease-in-out forwards;
-}
-
-@keyframes deslizarDerecha {
-    to { transform: translate(150%, 0) scale(0.9); opacity: 0; }
-}
-
-@keyframes deslizarIzquierda {
-    from { transform: translate(-150%, 0) scale(0.9); opacity: 0; }
-    to { transform: translate(0, 0) scale(1); opacity: 1; }
+.error { 
+    color: #ff4a4a; 
+    font-size: 0.9rem; 
+    margin-top: 15px; 
 }
 
 /* ==========================================
-   FRASES ANIMADAS
+   FRASES ANIMADAS (Ajustadas para salto de línea)
    ========================================== */
 .frase-animada {
     position: absolute;
     font-size: 1.5rem;
     font-weight: bold;
-    white-space: nowrap;
+    text-align: center;
+    max-width: 80vw;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: normal;
     transition: opacity 1.5s ease-in-out;
     opacity: 0;
     pointer-events: none;
@@ -142,4 +130,5 @@ button {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    display: block;
 }
